@@ -4,97 +4,100 @@
 <div>
     <h1 class="text-center p-5 bg-secondary text-white">World News</h1>
 </div>
-<div class="mt-4 mb-3 container pt-4 pb-1 px-4" style="background-color: #b8b8b8;">
-    <div class="d-flex flex-column">
-        <div class="px-2 pb-1"><strong>Lorem ipsum dolor sit amet, consectetur</strong> - 14 points</div>
-        <div class="px-2 pb-2">submitted 9 hours ago by <a href="">john-smith</a></div>               
-    </div>
-    <textarea class="form-control" disabled style="height: 110px; background-color: white;" >Lorem ipsum dolor sit amet, consectetur adipisicing elit. Soluta molestiae magni officiis asperiores iure perspiciatis distinctio, suscipit facere accusamus nobis vitae natus consequuntur eos repellat, aliquam omnis. Doloremque, quaerat iste? Lorem ipsum dolor sit amet, consectetur adipisicing elit. Soluta molestiae magni officiis asperiores iure perspiciatis distinctio, suscipit facere accusamus nobis vitae natus consequuntur eos repellat, aliquam omnis. Doloremque, quaerat iste. eos repellat, aliquam omnis. Doloremque, quaerat iste?</textarea>
-    <div class="d-flex flex-row mb-3 mt-2">
-        <div class="pb-2 d-flex flex-row"> 
+
+<div class="container mt-4 mb-3 pt-4  px-4 bg-light">
+    <div>
+        <p class="mb-2"><strong class="pe-2">Lorem ipsum dolor sit amet, consectetur</strong> 14 points</p>
+        <p class="mb-2">submitted 9 hours ago by <a href="">john-smith</a></p>
+        <textarea class="form-control mb-2" disabled style="min-height: 100px; background-color: white;" >Lorem ipsum dolor sit amet, consectetur adipisicing elit. Soluta molestiae magni officiis asperiores iure perspiciatis distinctio, suscipit facere accusamus nobis vitae natus consequuntur eos repellat, aliquam omnis. Doloremque, quaerat iste? Lorem ipsum dolor sit amet, consectetur adipisicing elit. Soluta molestiae magni officiis asperiores iure perspiciatis distinctio, suscipit facere accusamus nobis vitae natus consequuntur eos repellat, aliquam omnis. Doloremque, quaerat iste. eos repellat, aliquam omnis. Doloremque, quaerat iste?</textarea>
+        <div class="d-flex flex-row">
             <div class="px-2">
                 <button class="btn btn-light border-0 p-0 bg-transparent">
                     <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
+                </button>  
+                <button class="btn btn-light border-0 p-0 bg-transparent">
                     <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
                 </button>             
             </div>
-        </div> 
-        <div class="px-2"><a href="">Reply</a></div>
-        <div class="px-2"><a href="">Save</a></div>
-        <div class="px-2"><a href="">Report</a></div>
-        
-    </div>        
+            <p class="px-2"><a href="">3 comments</a></p>
+            <p class="px-2"><a id="replyToPostLink" href="#">Reply</a></p>
+            <p class="px-2"><a href="">Save</a></p>
+        </div>
+        <div id="replyToPostContainer"></div>
+    </div>
 </div>
+
 <div class="container">
-    <h2 class="mb-3">Comments</h2>
+    <h5>All 3 comments</h5>
 </div>
-<div class="container mb-4">
-    <div class="d-flex flex-column pt-2 pb-2 px-4" style="background-color: #b8b8b8;">            
-        <div class="d-flex flex-row pb-2">
-            <div class="px-2"><a href="">sergio-joya</a></div>
-            <div class="px-2">8 points</div>            
-            <div class="px-2">1 hour ago</div>
-        </div>  
-        <div class="px-2 pb-2">Lorem ipsum dolor sit amet, consectetur distinctio, suscipit facere accusamus nobis vitae natus consequuntur eos </div>
-        <div class="d-flex flex-row">
-            <div class="pb-2 d-flex flex-row"> 
-                <div class="px-2">
-                    <button class="btn btn-light border-0 p-0 bg-transparent">
-                        <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
-                        <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
-                    </button>             
-                </div>
-            </div> 
-            <div class="px-2"><a href="">Reply</a></div>
-            <div class="px-2"><a href="">Save</a></div>
-            <div class="px-2"><a href="">Report</a></div>
-        </div>  
+
+<div class="container bg-light px-4 pt-2">
+    <div class="d-flex flex-row mb-2">
+        <div class="pe-3"><a href="">sergio-joya</a></div>
+        <div class="pe-3">8 points</div>            
+        <div class="pe-3">1 hour ago</div>
     </div>
-</div>
-<div class="container mb-4">
-    <div class="d-flex flex-column pt-2 pb-2 px-4" style="background-color: #b8b8b8;">            
-        <div class="d-flex flex-row pb-2">
-            <div class="px-2"><a href="">sergio-joya</a></div>
-            <div class="px-2">5 points</div>            
-            <div class="px-2">2 hours ago</div>
-        </div>  
-        <div class="px-2 pb-2">Lorem ipsum dolor sit amet, consectetur distinctio, suscipit facere accusamus nobis vitae natus consequuntur eos </div>
-        <div class="d-flex flex-row">
-            <div class="pb-2 d-flex flex-row"> 
-                <div class="px-2">
-                    <button class="btn btn-light border-0 p-0 bg-transparent">
-                        <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
-                        <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
-                    </button>             
-                </div>
-            </div> 
-            <div class="px-2"><a href="">Reply</a></div>
-            <div class="px-2"><a href="">Save</a></div>
-            <div class="px-2"><a href="">Report</a></div>
-        </div>  
+    <div class="mb-2">
+        <div>Lorem ipsum dolor sit amet, consectetur distinctio, suscipit facere accusamus nobis vitae natus consequuntur eos </div>
     </div>
-</div>
-<div class="container mb-4">
-    <div class="d-flex flex-column pt-2 pb-2 px-4" style="background-color: #b8b8b8;">            
-        <div class="d-flex flex-row pb-2">
-            <div class="px-2"><a href="">sergio-joya</a></div>
-            <div class="px-2">2 points</div>            
-            <div class="px-2">3 hours ago</div>
-        </div>  
-        <div class="px-2 pb-2">Lorem ipsum dolor sit amet, consectetur distinctio, suscipit facere accusamus nobis vitae natus consequuntur eos </div>
-        <div class="d-flex flex-row">
-            <div class="pb-2 d-flex flex-row"> 
-                <div class="px-2">
-                    <button class="btn btn-light border-0 p-0 bg-transparent">
-                        <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
-                        <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
-                    </button>             
-                </div>
-            </div> 
-            <div class="px-2"><a href="">Reply</a></div>
-            <div class="px-2"><a href="">Save</a></div>
-            <div class="px-2"><a href="">Report</a></div>
-        </div>  
+    <div class="d-flex flex-row">
+        <div class="px-2">
+            <button class="btn btn-light border-0 p-0 bg-transparent">
+                <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
+            </button>  
+            <button class="btn btn-light border-0 p-0 bg-transparent">
+                <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
+            </button>             
+        </div>
+        <p class="px-2" id="replyToCommentLink"><a href="#">Reply</a></p>
+        <p class="px-2"><a href="">Save</a></p>
     </div>
+    <div id="replyToCommentContainer"></div>
 </div>
+
+<script>
+    const replyToPost = document.getElementById("replyToPostLink");
+    replyToPost.addEventListener("click", function() {
+
+        event.preventDefault();
+        document.getElementById("replyToPostContainer").innerHTML = `
+        <form>
+            <div class="form-floating mb-3">
+                <textarea class="form-control" id="replyToPost" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                <label for="replyToPost">Comments</label>
+            </div>                    
+            <button type="button" id="cancelButton" class="btn btn-primary mb-3 me-2">Cancel</button>
+            <button type="submit" class="btn btn-primary mb-3">Submit</button>
+        </form>
+        `;
+
+        const cancelButton = document.getElementById("cancelButton");
+        cancelButton.addEventListener("click", function() {
+        document.getElementById("replyToPostContainer").innerHTML = "";
+        });
+    });
+</script>
+    
+<script>
+    const replyToComment = document.getElementById("replyToCommentLink");
+    replyToComment.addEventListener("click", function() {
+
+        event.preventDefault();
+        document.getElementById("replyToCommentContainer").innerHTML = `
+        <form>
+            <div class="form-floating mb-3">
+                <textarea class="form-control" id="replyToPost" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                <label for="replyToPost">Comments</label>
+            </div>                    
+            <button type="button" id="cancelButton1" class="btn btn-primary mb-3 me-2">Cancel</button>
+            <button type="submit" class="btn btn-primary mb-3">Submit</button>
+        </form>
+        `;
+
+        const cancelButton = document.getElementById("cancelButton1");
+        cancelButton.addEventListener("click", function() {
+        document.getElementById("replyToCommentContainer").innerHTML = "";
+        });
+    });
+</script>
 {% endblock %}
