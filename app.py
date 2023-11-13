@@ -13,3 +13,7 @@ def view_post():
 @app.get('/create_post_form')
 def view_post_form():
     return render_template('create_post_form.html')
+
+@app.get('/user_profile')
+def view_user():
+    return render_template('user_profile.html')
