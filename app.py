@@ -15,6 +15,10 @@ def index():
     user = {'username': 'johndoe', 'profile_picture': 'https://t3.ftcdn.net/jpg/00/64/67/52/240_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg', 'summary': 'Short bio'}
     return render_template('index.html', user=user, posts=posts)
 
-@app.get('/view-post')
+@app.get('/view_post')
 def view_post():
-    return render_template('view-post.html')
+    return render_template('view_post.html')
+
+@app.get('/create_post_form')
+def view_post_form():
+    return render_template('create_post_form.html')

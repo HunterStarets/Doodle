@@ -1,0 +1,202 @@
+{% extends '_template.html' %}
+
+{% block body %}
+<div>
+    <h1 class="text-center bg-secondary text-white p-5 mb-4">World News</h1>
+</div>
+
+<div class="container vote bg-light mb-4 pt-4 px-4">
+    <p class="mb-2"><strong class="pe-2">Title</strong><span class="points">14</span> points</p>
+    <p class="mb-2">submitted 9 hours ago by <a href="#">john-smith</a></p>
+    <div id="edit-post-container">
+        <form>
+            <textarea id="post-textarea" class="form-control mb-2" style="min-height: 125px; background-color: white;" disabled>Lorem</textarea>
+            <label for="post-textarea" hidden></label>
+            <button type="button" class="cancel-button btn btn-primary mt-2 mb-3 me-2" hidden>Cancel</button>
+            <button type="submit" class="submit-button btn btn-primary mt-2 mb-3" hidden>Submit</button>
+        </form>
+    </div>
+    <div class="d-flex flex-row pt-1">
+        <div class="px-2">
+            <button class="btn btn-light bg-transparent upvote-button border-0 p-0">
+                <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
+            </button>  
+            <button class="btn btn-light bg-transparent downvote-button border-0 p-0">
+                <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
+            </button>
+        </div>
+        <div class="d-flex flex-row pb-3">
+            <a class="px-2" id="edit-post-link" href="#">Edit</a>
+            <a class="px-2" id="delete-post-link" href="#">Delete</a>
+            <a class="px-2" id="reply-post-link" href="#">Reply</a>
+            <a class="px-2" id="save-post-link" href="#">Save</a>
+        </div>                        
+    </div>
+    <div id="reply-post-container" hidden>
+        <form>
+            <div class="form-floating mb-3">
+                <textarea class="form-control" id="reply-post" placeholder="Leave a comment here" style="height: 100px"></textarea>
+                <label for="reply-post">Comments</label>
+            </div>                    
+            <button type="button" class="cancel-button btn btn-primary mb-3 me-2">Cancel</button>
+            <button type="submit" class="submit-button btn btn-primary mb-3">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div class="container">
+    <h5>All comments</h5>
+</div>
+
+<div class="container vote bg-light px-4 pt-2">
+    <div class="d-flex flex-row">
+        <a href="#" class="pe-3">sergio-joya</a>
+        <p class="pe-3"><span class="points">8</span> points</p>            
+        <p class="pe-3">1 hour ago</p>
+    </div>
+    <div>
+        <p>Lorem</p>
+    </div>
+    <div class="d-flex flex-row pb-3">
+        <div class="px-2">
+            <button class="btn btn-light bg-transparent upvote-button border-0 p-0">
+                <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
+            </button>  
+            <button class="btn btn-light bg-transparent downvote-button border-0 p-0">
+                <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
+            </button>
+        </div>
+        <a class="px-2 reply-comment-link" href="#">Reply</a>
+        <a class="px-2 save-comment-link" href="#">Save</a>
+    </div>
+    <div class="reply-comment-container" hidden>
+        <form>
+            <div class="form-floating mb-3">
+                <textarea class="form-control" id="reply-comment" placeholder="Leave a comment here" style="height: 100px"></textarea>
+                <label for="reply-comment">Comments</label>
+            </div>                    
+            <button type="button" class="cancel-button btn btn-primary mb-3 me-2">Cancel</button>
+            <button type="submit" class="submit-button btn btn-primary mb-3">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const voteContainers = document.querySelectorAll(".vote");
+
+    voteContainers.forEach(container => {
+    const upVoteButton = container.querySelector('.upvote-button');
+    const downVoteButton = container.querySelector('.downvote-button');
+    const points = container.querySelector('.points');
+    let hasUpVoted = false;
+    let hasDownVoted = false;
+
+    upVoteButton.addEventListener('click', function() {
+        if (hasDownVoted) {
+            points.textContent = parseInt(points.textContent) + 1;
+            downVoteButton.disabled = false;
+            upVoteButton.disabled = false;
+            hasUpVoted = false;
+            hasDownVoted = false;
+        } else if (!hasUpVoted) {
+            points.textContent = parseInt(points.textContent) + 1;
+            upVoteButton.disabled = true;
+            downVoteButton.disabled = false;                
+            hasUpVoted = true;
+            hasDownVoted = false;
+        }
+    });
+
+    downVoteButton.addEventListener('click', function() {
+        if (hasUpVoted) {
+            points.textContent = parseInt(points.textContent) - 1;
+            upVoteButton.disabled = false;
+            downVoteButton.disabled = false;
+            hasUpVoted = false;
+            hasDownVoted = false;
+        } else if (!hasDownVoted) {
+            points.textContent = parseInt(points.textContent) - 1;
+            downVoteButton.disabled = true;
+            upVoteButton.disabled = false;                
+            hasDownVoted = true;
+            hasUpVoted = false;
+        }
+    });
+});
+</script>
+
+<script>
+    const replyToPostLink = document.getElementById("reply-post-link");
+
+    replyToPostLink.addEventListener("click", function() {
+        event.preventDefault();
+        const replyToPostContainer = document.getElementById("reply-post-container")
+        replyToPostContainer.removeAttribute('hidden');
+
+        const cancelButton = replyToPostContainer.querySelector('.cancel-button');
+        cancelButton.addEventListener("click", function() {
+            replyToPostContainer.setAttribute('hidden', true);
+        });
+
+        const submitButton = replyToPostContainer.querySelector('.submit-button');
+        submitButton.addEventListener("click", function() {
+            replyToPostContainer.setAttribute('hidden', true);
+        });
+    }); 
+</script>
+
+<!-- not done -->
+<script>
+    const replyToCommentLinks = document.querySelectorAll(".reply-comment-link");
+
+    replyToCommentLinks.forEach(replyToCommentLink => {
+        replyToCommentLink.addEventListener("click", function() {
+            event.preventDefault();
+            const replyToCommentContainer = replyToCommentLink.closest(".reply-comment-container")
+            replyToCommentContainer.removeAttribute('hidden');
+
+            const cancelButton = replyToCommentContainer.querySelector('.cancel-button');
+            cancelButton.addEventListener("click", function() {
+                replyToCommentContainer.setAttribute('hidden', true);
+            });
+
+            const submitButton = replyToCommentContainer.querySelector('.submit-button');
+            submitButton.addEventListener("click", function() {
+                replyToCommentContainer.setAttribute('hidden', true);
+            });
+        });
+    });
+</script>
+
+<script>
+    const editPostLink = document.getElementById("edit-post-link");
+
+    editPostLink.addEventListener("click", function() {
+        event.preventDefault();
+        const editPostContainer = document.getElementById("edit-post-container");
+        const label = editPostContainer.querySelector('label');
+        const cancelButton = editPostContainer.querySelector('.cancel-button');
+        const submitButton = editPostContainer.querySelector('.submit-button');
+        const textarea = document.getElementById("post-textarea");
+        textarea.removeAttribute('disabled');        
+
+        textarea.focus();
+        label.removeAttribute('hidden');
+        cancelButton.removeAttribute('hidden');
+        submitButton.removeAttribute('hidden');
+        
+
+        cancelButton.addEventListener("click", function() {
+            label.setAttribute('hidden', true);
+            cancelButton.setAttribute('hidden', true);
+            submitButton.setAttribute('hidden', true);
+        });
+
+        submitButton.addEventListener("click", function() {
+            label.setAttribute('hidden', true);
+            cancelButton.setAttribute('hidden', true);
+            submitButton.setAttribute('hidden', true);
+        });
+    }); 
+</script>
+{% endblock %}

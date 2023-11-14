@@ -1,0 +1,26 @@
+{% extends '_template.html' %}
+
+{% block body %}
+<div>
+    <h1 class="text-center p-5 mb-4 bg-secondary text-white">Create Post</h1>
+</div>
+<form class="container bg-light px-4 pt-3 pb-4">
+    <div class="mb-3">
+        <label for="title" class="form-label">Title *</label>
+        <input type="text" id="title" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="body" class="form-label">Body *</label>
+        <div class="form-floating">
+            <textarea id="body" class="form-control" style="height: 100px" required></textarea>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="community-name" class="form-label">Community Name (optional)</label>
+        <input type="text" id="community-name" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+{% endblock %}
