@@ -1,14 +1,17 @@
 {% if user %}
-<div class="card" style="width: 25%;">
+<div class="card">
     <img src="{{ user.profile_picture }}" class="card-img-top" alt="{{ user.username }}'s profile picture">
     <div class="card-body">
         <h5 class="card-title">{{ user.username }}</h5>
         <p class="card-text">{{ user.summary }}</p>
-        <!-- <a href="#" class="btn btn-primary">View Profile</a> -->
+        <a href="{{ url_for('create_post_form')}}" class="btn btn-primary" style="width:100%; margin-top:10px;">Submit a
+            new
+            post</a>
+
     </div>
 </div>
 {% else %}
-<div class="card" style="width: 25%;">
+<div class="card">
     <div class="card-body">
         <h5 class="card-title">Login</h5>
         <form action="/login" method="post">
@@ -27,7 +30,6 @@
             <button type="submit" class="btn btn-primary">Login</button>
             <a href="#" class="btn btn-link">Forgot Password</a>
         </form>
-        <button type="post" class="btn btn-primary" style="width:100%; margin-top:10px;">Submit a new post</button>
     </div>
 
 </div>
