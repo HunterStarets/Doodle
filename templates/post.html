@@ -1,0 +1,14 @@
+<div>
+    <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">{{ post.title }}</h5>
+        <small>{{ post.net_upvotes() }} points</small>
+    </div>
+    <p class="mb-1">Submitted {{ post.submitted_time }} by {{ post.submitter }} to {{ post.community }}</p>
+
+    <p>test</p>
+    <div class="mt-2">
+        <p>{{ post.comments|length }} comments</p>
+        <!-- Include upvote/downvote buttons if needed -->
+    </div>
+
+</div>

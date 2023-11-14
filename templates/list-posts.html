@@ -1,0 +1,18 @@
+{% for post in posts %}
+<div class="list-group">
+  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">{{ post.title }}</h5>
+      <small>{{ post.net_upvotes() }} points</small>
+    </div>
+    <p class="mb-1">Submitted {{ post.submitted_time }} by {{ post.submitter }} to {{ post.community }}</p>
+    <small>{{ post.comments|length }} comments</small>
+    <div class="mt-2">
+      <button class="btn btn-secondary btn-sm">Reply</button>
+      <button class="btn btn-secondary btn-sm">Save</button>
+      <button class="btn btn-secondary btn-sm">Report</button>
+      <!-- Include upvote/downvote buttons if needed -->
+    </div>
+  </a>
+</div>
+{% endfor %}
