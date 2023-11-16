@@ -1,0 +1,11 @@
+{% for post in posts %}
+{% if loop.first %}
+<div>
+  {% include 'post.html' %}
+</div>
+{% else %}
+<div class="mt-4">
+  {% include 'post.html' %}
+</div>
+{% endif %}
+{% endfor %}
