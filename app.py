@@ -92,3 +92,4 @@ def user_comments_only():
         Comment('johndoe',["upvote1","upvote2","upvote3"],["downvote1"],2,"nice thing"),
     ]
     return render_template('user_comments_only.html',view_profile_active=True,user=user,user_comments=user_comments)
+
