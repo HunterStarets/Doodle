@@ -1,0 +1,11 @@
+{% for comment in post.comments %}
+{% if loop.first %}
+<div>
+    {% include 'comment.html' %}
+</div>
+{% else %}
+<div class="mt-4">
+    {% include 'comment.html' %}
+</div>
+{% endif %}
+{% endfor %}
