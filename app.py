@@ -105,6 +105,7 @@ def user_comments_only():
     ]
     return render_template('user_comments_only.html',view_profile_active=True,user=user,user_comments=user_comments)
 
+# user sessions
 @app.get('/login')
 def login():
     return render_template('login.html')
@@ -121,4 +122,4 @@ def signup():
     new_user = User(email, username, password, first_name, last_name)
     db.session.add(new_user)
     db.session.commit()
-    return redirect('/login')
+    return redirect('/secret')
