@@ -114,6 +114,12 @@ def get_login_page():
         return redirect('/secret')
     return render_template('login.html')
 
+@app.get('/signup')
+def get_signup_page():
+    if 'username' in session:
+        return redirect('/secret')
+    return render_template('signup.html')
+
 @app.post('/signup')
 def signup():
     email = request.form.get('email')
@@ -123,13 +129,17 @@ def signup():
     last_name = request.form.get('last-name')
     if not email or not username or not raw_password or not first_name or not last_name: 
         abort(400)
-    existing_user = User.query.filter_by(username=username).first()
-    if existing_user:
+    existing_email = User.query.filter_by(email=email).first()
+    if existing_email:
+        abort(400)
+    existing_username = User.query.filter_by(username=username).first()
+    if existing_username:
         abort(400)
     hashed_password = bcrypt.generate_password_hash(raw_password, 12).decode()
     new_user = User(email, username, hashed_password, first_name, last_name)
     db.session.add(new_user)
     db.session.commit()
+    session['username'] = username
     return redirect('/secret')
 
 @app.post('/login')
