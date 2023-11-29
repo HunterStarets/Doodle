@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, abort, redirect, session
 from flask_bcrypt import Bcrypt
 from datetime import datetime
+from src.repositories.post_repository import post_repository_singleton
 #TODO move comment and post objects into appropriate folder and update imports
 from post import Post
 from comment import Comment
@@ -37,14 +38,6 @@ def index():
     
     #final render
     return render_template('index.html', home_active=True, user=user, posts=posts)
-
-@app.get('/view_post/<post_id>')
-def view_post(post_id):
-    #temporary
-    post = find_post_by_id(post_id)
-
-    #final render
-    return render_template('view_post.html', post=post)
  
 @app.get('/view_profile')
 def view_profile():
@@ -103,6 +96,7 @@ def user_comments_only():
     ]
     return render_template('user_comments_only.html',view_profile_active=True,user=user,user_comments=user_comments)
 
+# all code from sprint03 
 # Adding bcrypt and user sessions
 @app.get('/login')
 def get_login_page():
@@ -187,3 +181,18 @@ def create_post():
     db.session.add(new_post)
     db.session.commit()
     return redirect('/secret')
+
+# View single post
+
+# @app.get('/view_post/<post_id>')
+# def view_post(post_id):
+#     #temporary
+#     post = find_post_by_id(post_id)
+
+#     #final render
+#     return render_template('view_post.html', post=post)
+
+@app.get('/posts/<post_id>')
+def get_single_post(post_id: int):
+    single_post = post_repository_singleton.get_post_by_id(post_id)
+    return render_template('view_post', post=single_post)
