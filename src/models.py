@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime 
 
 db = SQLAlchemy()
 
@@ -21,4 +22,3 @@ class User(db.Model):
 
     def __repr__(self) -> str:
         return f'User({self.user_id}, {self.email}, {self.username}, {self.password}, {self.first_name}, {self.last_name})'
-    
