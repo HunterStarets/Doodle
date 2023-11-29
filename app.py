@@ -107,6 +107,7 @@ def user_comments_only():
     ]
     return render_template('user_comments_only.html',view_profile_active=True,user=user,user_comments=user_comments)
 
+
 #Bcrypt
 @app.get('/login')
 def get_login_page():
