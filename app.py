@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, abort, redirect, session
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 #TODO move comment and post objects into appropriate folder and update imports
 from post import Post
 from comment import Comment
-from src.models import User, db
+from src.models import db, User, Post2
 from dotenv import load_dotenv
 import os
 
@@ -44,12 +45,7 @@ def view_post(post_id):
 
     #final render
     return render_template('view_post.html', post=post)
-
-@app.get('/create_post_form')
-def create_post_form():
-    #final
-    return render_template('create_post_form.html')
-
+ 
 @app.get('/view_profile')
 def view_profile():
     #get current user
@@ -107,7 +103,7 @@ def user_comments_only():
     ]
     return render_template('user_comments_only.html',view_profile_active=True,user=user,user_comments=user_comments)
 
-#Bcrypt
+# Adding bcrypt and user sessions
 @app.get('/login')
 def get_login_page():
     if 'username' in session:
@@ -166,3 +162,28 @@ def get_secret_page():
     if 'username' not in session:
         abort(401)
     return render_template('secret.html', username=session['username'])
+
+# Creating posts
+@app.get('/posts/new')
+def create_post_form():
+    if 'username' not in session:
+        abort(401)
+    return render_template('create_post_form.html')
+
+@app.post('/posts')
+def create_post():
+    title = request.form.get('title')
+    content = request.form.get('content')
+    community_name = request.form.get('community-name')
+    timestamp = datetime.utcnow()
+    points = 0
+    username = session['username']
+    user = User.query.filter_by(username=username).first()
+    
+    if not (title and content and username and user):
+        abort(400)
+    user_id = user.user_id
+    new_post = Post2(title, content, community_name, timestamp, points, user_id) # type: ignore
+    db.session.add(new_post)
+    db.session.commit()
+    return redirect('/secret')
