@@ -1,9 +1,8 @@
-from flask import Flask, render_template, request, abort, redirect
-
+from flask import Flask, render_template, request, abort, redirect, session
+from flask_bcrypt import Bcrypt
 #TODO move comment and post objects into appropriate folder and update imports
 from post import Post
 from comment import Comment
-
 from src.models import User, db
 from dotenv import load_dotenv
 import os
@@ -17,7 +16,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = \
     f'postgresql://{os.getenv("DB_USER")}:{os.getenv("DB_PASS")}@{os.getenv("DB_HOST")}:{os.getenv("DB_PORT")}/{os.getenv("DB_NAME")}'
 app.config['SQLALCHEMY_ECHO'] = True
 
+app.secret_key = os.getenv('APP_SECRET_KEY', 'super-secure')
+
 db.init_app(app)
+bcrypt = Bcrypt(app)
 
 #Mock Test Data
 posts = [
@@ -105,21 +107,63 @@ def user_comments_only():
     ]
     return render_template('user_comments_only.html',view_profile_active=True,user=user,user_comments=user_comments)
 
-# user sessions
+
+#Bcrypt
 @app.get('/login')
-def login():
+def get_login_page():
+    if 'username' in session:
+        return redirect('/secret')
     return render_template('login.html')
+
+@app.get('/signup')
+def get_signup_page():
+    if 'username' in session:
+        return redirect('/secret')
+    return render_template('signup.html')
 
 @app.post('/signup')
 def signup():
     email = request.form.get('email')
     username = request.form.get('username')
-    password = request.form.get('password')
+    raw_password = request.form.get('password')
     first_name = request.form.get('first-name')
     last_name = request.form.get('last-name')
-    if not email or not username or not password or not first_name or not last_name: 
+    if not email or not username or not raw_password or not first_name or not last_name: 
         abort(400)
-    new_user = User(email, username, password, first_name, last_name)
+    existing_email = User.query.filter_by(email=email).first()
+    if existing_email:
+        abort(400)
+    existing_username = User.query.filter_by(username=username).first()
+    if existing_username:
+        abort(400)
+    hashed_password = bcrypt.generate_password_hash(raw_password, 12).decode()
+    new_user = User(email, username, hashed_password, first_name, last_name)
     db.session.add(new_user)
     db.session.commit()
+    session['username'] = username
     return redirect('/secret')
+
+@app.post('/login')
+def login():
+    username = request.form.get('username')
+    raw_password = request.form.get('password')
+    if not username or not raw_password:   
+        abort(401)
+    existing_user = User.query.filter_by(username=username).first()
+    if not existing_user: 
+        abort(401)
+    if not bcrypt.check_password_hash(existing_user.password, raw_password):
+        abort(401)
+    session['username'] = username
+    return redirect('/secret')
+
+@app.post('/logout')
+def logout():
+    del session['username']
+    return redirect('/login')
+
+@app.get('/secret')
+def get_secret_page():
+    if 'username' not in session:
+        abort(401)
+    return render_template('secret.html', username=session['username'])
