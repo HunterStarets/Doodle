@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, abort, redirect
 from post import Post
 from comment import Comment
 
-from src.models import db
+from src.models import User, db
 from dotenv import load_dotenv
 import os
 
@@ -105,3 +105,21 @@ def user_comments_only():
     ]
     return render_template('user_comments_only.html',view_profile_active=True,user=user,user_comments=user_comments)
 
+# user sessions
+@app.get('/login')
+def login():
+    return render_template('login.html')
+
+@app.post('/signup')
+def signup():
+    email = request.form.get('email')
+    username = request.form.get('username')
+    password = request.form.get('password')
+    first_name = request.form.get('first-name')
+    last_name = request.form.get('last-name')
+    if not email or not username or not password or not first_name or not last_name: 
+        abort(400)
+    new_user = User(email, username, password, first_name, last_name)
+    db.session.add(new_user)
+    db.session.commit()
+    return redirect('/secret')
