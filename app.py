@@ -29,13 +29,19 @@ posts = [
     Post("Post Title 3", "user1", "d/community1", ["comment1", "comment2"], ["upvote1"], ["downvote1", "downvote2"], 2, "Vitae purus faucibus ornare suspendisse sed. Eu feugiat pretium nibh ipsum consequat nisl vel. Interdum consectetur libero id faucibus nisl. Condimentum vitae sapien pellentesque habitant. Non nisi est sit amet facilisis magna etiam tempor orci."),
 ]
 
+
 @app.route('/')
 def index():
     #mock test data
-    user = None 
-    user = {'username': 'johndoe', 'profile_picture': 'https://t3.ftcdn.net/jpg/00/64/67/52/240_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg', 'summary': 'Short bio'}
+    if 'user_id' not in session:
+        user = None 
+    else: 
+        user = User.get_user_by_id(session['user_id'])
+
+    #user = {'username': 'johndoe', 'profile_picture': 'https://t3.ftcdn.net/jpg/00/64/67/52/240_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg', 'summary': 'Short bio'}
     
     #final render
+    posts = Post2.get_all_posts()
     return render_template('index.html', home_active=True, user=user, posts=posts)
 
 @app.get('/view_post/<post_id>')
@@ -123,6 +129,7 @@ def signup():
     raw_password = request.form.get('password')
     first_name = request.form.get('first-name')
     last_name = request.form.get('last-name')
+    
     if not email or not username or not raw_password or not first_name or not last_name: 
         abort(400)
     existing_email = User.query.filter_by(email=email).first()
@@ -150,7 +157,8 @@ def login():
     if not bcrypt.check_password_hash(existing_user.password, raw_password):
         abort(401)
     session['username'] = username
-    return redirect('/secret')
+    session['user_id'] = existing_user.user_id
+    return redirect('/')
 
 @app.post('/logout')
 def logout():
@@ -176,14 +184,13 @@ def create_post():
     content = request.form.get('content')
     community_name = request.form.get('community-name')
     timestamp = datetime.utcnow()
-    points = 0
-    username = session['username']
-    user = User.query.filter_by(username=username).first()
+    author_id = session['user_id']
+    user = User.query.filter_by(user_id=author_id).first()
     
-    if not (title and content and username and user):
+    if not (title and content and author_id and user):
         abort(400)
-    user_id = user.user_id
-    new_post = Post2(title, content, community_name, timestamp, points, user_id) # type: ignore
+ 
+    new_post = Post2(author_id, title, content, timestamp, community_name, author_id) # type: ignore
     db.session.add(new_post)
     db.session.commit()
     return redirect('/secret')
