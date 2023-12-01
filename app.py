@@ -130,6 +130,7 @@ def signup():
     db.session.add(new_user)
     db.session.commit()
     session['username'] = username
+    session['user_id'] = new_user.user_id
     return redirect('/secret')
 
 @app.post('/login')
@@ -144,6 +145,7 @@ def login():
     if not bcrypt.check_password_hash(existing_user.password, raw_password):
         abort(401)
     session['username'] = username
+    session['user_id'] = existing_user.user_id
     return redirect('/secret')
 
 @app.post('/logout')
@@ -184,15 +186,97 @@ def create_post():
 
 # View single post
 
-# @app.get('/view_post/<post_id>')
-# def view_post(post_id):
-#     #temporary
-#     post = find_post_by_id(post_id)
+@app.get('/view_post/<post_id>')
+def view_post(post_id):
+    #temporary
+    post = find_post_by_id(post_id)
 
-#     #final render
-#     return render_template('view_post.html', post=post)
+    #final render
+    return render_template('view_post.html', post=post)
 
-@app.get('/posts/<post_id>')
-def get_single_post(post_id: int):
-    single_post = post_repository_singleton.get_post_by_id(post_id)
-    return render_template('view_post', post=single_post)
+# @app.get('/posts/<post_id>')
+# def get_single_post(post_id: int):
+#     single_post = post_repository_singleton.get_post_by_id(post_id)
+#     return render_template('view_post.html', post=single_post)
+
+# Edit user information
+@app.get('/users/<int:user_id>/edit')
+def edit_user_form(user_id: int):
+    if 'user_id' not in session:
+        abort(401)
+    if session['user_id'] != user_id:
+        abort(403)
+    existing_user = User.query.filter_by(user_id=user_id).first()
+    return render_template('edit_user_form.html', user_id=user_id, existing_user=existing_user)
+
+@app.post('/users/<int:user_id>')
+def edit_user(user_id: int):
+    email = request.form.get('email')
+    username = request.form.get('username')
+    current_password = request.form.get('current-password')
+    new_password = request.form.get('new-password')
+    verify_password = request.form.get('verify-password')
+    first_name = request.form.get('first-name')
+    last_name = request.form.get('last-name')
+
+    if not(email and username and current_password and new_password and first_name and last_name): 
+        abort(400)
+
+    existing_user = User.query.filter_by(user_id=user_id).first()
+    if not existing_user:
+        abort(404)
+
+    if email != existing_user.email: 
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_email:
+            abort(400)
+
+    if username != existing_user.username:
+        existing_username = User.query.filter_by(username=username).first()
+        if existing_username:
+            abort(400)
+
+    if not bcrypt.check_password_hash(existing_user.password, current_password):
+        abort(401)
+
+    if new_password != verify_password:
+        abort(400)
+
+    existing_user.email = email
+    existing_user.username = username
+    hashed_password = bcrypt.generate_password_hash(new_password, 12).decode()
+    existing_user.password = hashed_password
+    existing_user.first_name = first_name
+    existing_user.last_name = last_name
+    db.session.commit()
+    return redirect('/secret')
+
+# Delete user 
+@app.get('/users/<int:user_id>/delete')
+def get_delete_user_page(user_id: int):
+    if 'user_id' not in session:
+        abort(401)
+    if session['user_id'] != user_id:
+        abort(401)
+    existing_user = User.query.filter_by(user_id=user_id).first()
+    return render_template('delete_user.html', existing_user=existing_user)
+
+@app.post('/users/<int:user_id>/delete')
+def delete_user(user_id: int):
+    username = request.form.get('username')
+    password = request.form.get('password')
+    checkbox = request.form.get('checkbox')
+
+    if not(username and password and checkbox):
+        abort(400)
+    
+    existing_user = User.query.filter_by(username=username).first()
+    if not existing_user: 
+        abort(401)
+    if not bcrypt.check_password_hash(existing_user.password, password):
+        abort(401)
+    db.session.delete(existing_user)
+    db.session.commit()
+    del session['username']
+    del session['user_id']
+    return redirect('/login')
