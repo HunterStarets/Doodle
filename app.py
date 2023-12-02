@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, abort, redirect, session
 from flask_bcrypt import Bcrypt
 from datetime import datetime
 from src.repositories.post_repository import post_repository_singleton
+from src.repositories.user_repository import user_repository_singleton
 #TODO move comment and post objects into appropriate folder and update imports
 from post import Post
 from comment import Comment
@@ -29,6 +30,15 @@ posts = [
     Post("Post Title 2", "user1", "d/community1", ["comment1", "comment2"], ["upvote1"], ["downvote1", "downvote2"], 1, "Malesuada proin libero nunc consequat interdum. Ac turpis egestas sed tempus urna et. Iaculis eu non diam phasellus vestibulum lorem sed. Egestas sed tempus urna et pharetra pharetra massa massa ultricies. Porttitor massa id neque aliquam vestibulum morbi blandit cursus risus. Lorem donec massa sapien faucibus et molestie."),
     Post("Post Title 3", "user1", "d/community1", ["comment1", "comment2"], ["upvote1"], ["downvote1", "downvote2"], 2, "Vitae purus faucibus ornare suspendisse sed. Eu feugiat pretium nibh ipsum consequat nisl vel. Interdum consectetur libero id faucibus nisl. Condimentum vitae sapien pellentesque habitant. Non nisi est sit amet facilisis magna etiam tempor orci."),
 ]
+
+# View single post
+@app.get('/view_post/<post_id>')
+def view_post(post_id):
+    #temporary
+    post = find_post_by_id(post_id)
+
+    #final render
+    return render_template('view_post.html', post=post)
 
 @app.route('/')
 def index():
@@ -97,16 +107,11 @@ def user_comments_only():
     return render_template('user_comments_only.html',view_profile_active=True,user=user,user_comments=user_comments)
 
 # all code from sprint03 
-# Adding bcrypt and user sessions
-@app.get('/login')
-def get_login_page():
-    if 'username' in session:
-        return redirect('/secret')
-    return render_template('login.html')
 
+# User sign up 
 @app.get('/signup')
-def get_signup_page():
-    if 'username' in session:
+def get_signup_form():
+    if 'user_id' in session:
         return redirect('/secret')
     return render_template('signup.html')
 
@@ -117,14 +122,18 @@ def signup():
     raw_password = request.form.get('password')
     first_name = request.form.get('first-name')
     last_name = request.form.get('last-name')
-    if not email or not username or not raw_password or not first_name or not last_name: 
+
+    if not (email and username and raw_password and first_name and last_name): 
         abort(400)
+
     existing_email = User.query.filter_by(email=email).first()
     if existing_email:
         abort(400)
+
     existing_username = User.query.filter_by(username=username).first()
     if existing_username:
         abort(400)
+
     hashed_password = bcrypt.generate_password_hash(raw_password, 12).decode()
     new_user = User(email, username, hashed_password, first_name, last_name)
     db.session.add(new_user)
@@ -132,6 +141,13 @@ def signup():
     session['username'] = username
     session['user_id'] = new_user.user_id
     return redirect('/secret')
+
+# User login
+@app.get('/login')
+def get_login_page():
+    if 'username' in session:
+        return redirect('/secret')
+    return render_template('login.html')
 
 @app.post('/login')
 def login():
@@ -150,19 +166,21 @@ def login():
 
 @app.post('/logout')
 def logout():
+    del session['user_id']
     del session['username']
     return redirect('/login')
 
 @app.get('/secret')
 def get_secret_page():
-    if 'username' not in session:
+    if 'user_id' not in session:
         abort(401)
     return render_template('secret.html', username=session['username'])
 
+#=========================================
 # Creating posts
 @app.get('/posts/new')
 def create_post_form():
-    if 'username' not in session:
+    if 'user_id' not in session:
         abort(401)
     return render_template('create_post_form.html')
 
@@ -173,41 +191,28 @@ def create_post():
     community_name = request.form.get('community-name')
     timestamp = datetime.utcnow()
     points = 0
-    username = session['username']
-    user = User.query.filter_by(username=username).first()
-    
-    if not (title and content and username and user):
+    if not (title and content and community_name):
         abort(400)
-    user_id = user.user_id
-    new_post = Post2(title, content, community_name, timestamp, points, user_id) # type: ignore
-    db.session.add(new_post)
-    db.session.commit()
+
+    user_id = session.get('user_id')
+    user = user_repository_singleton.get_user_by_id(user_id)
+
+    if not (user_id and user):    
+        abort(401)
+
+    author_id = user.user_id
+    post_repository_singleton.create_post(title, content, community_name, timestamp, points, author_id)
     return redirect('/secret')
 
-# View single post
-
-@app.get('/view_post/<post_id>')
-def view_post(post_id):
-    #temporary
-    post = find_post_by_id(post_id)
-
-    #final render
-    return render_template('view_post.html', post=post)
-
-# @app.get('/posts/<post_id>')
-# def get_single_post(post_id: int):
-#     single_post = post_repository_singleton.get_post_by_id(post_id)
-#     return render_template('view_post.html', post=single_post)
-
-# Edit user information
+# Edit user
 @app.get('/users/<int:user_id>/edit')
 def edit_user_form(user_id: int):
     if 'user_id' not in session:
         abort(401)
     if session['user_id'] != user_id:
         abort(403)
-    existing_user = User.query.filter_by(user_id=user_id).first()
-    return render_template('edit_user_form.html', user_id=user_id, existing_user=existing_user)
+    existing_user = user_repository_singleton.get_user_by_id(user_id)
+    return render_template('edit_user_form.html', existing_user=existing_user)
 
 @app.post('/users/<int:user_id>')
 def edit_user(user_id: int):
@@ -219,12 +224,12 @@ def edit_user(user_id: int):
     first_name = request.form.get('first-name')
     last_name = request.form.get('last-name')
 
-    if not(email and username and current_password and new_password and first_name and last_name): 
+    if not(email and username and current_password and new_password and verify_password and first_name and last_name): 
         abort(400)
 
-    existing_user = User.query.filter_by(user_id=user_id).first()
+    existing_user = user_repository_singleton.get_user_by_id(user_id)
     if not existing_user:
-        abort(404)
+        abort(401)
 
     if email != existing_user.email: 
         existing_email = User.query.filter_by(email=email).first()
@@ -242,13 +247,8 @@ def edit_user(user_id: int):
     if new_password != verify_password:
         abort(400)
 
-    existing_user.email = email
-    existing_user.username = username
     hashed_password = bcrypt.generate_password_hash(new_password, 12).decode()
-    existing_user.password = hashed_password
-    existing_user.first_name = first_name
-    existing_user.last_name = last_name
-    db.session.commit()
+    user_repository_singleton.edit_user(existing_user, email, username, hashed_password, first_name, last_name)
     return redirect('/secret')
 
 # Delete user 
@@ -257,8 +257,8 @@ def get_delete_user_page(user_id: int):
     if 'user_id' not in session:
         abort(401)
     if session['user_id'] != user_id:
-        abort(401)
-    existing_user = User.query.filter_by(user_id=user_id).first()
+        abort(403)
+    existing_user = user_repository_singleton.get_user_by_id(user_id)
     return render_template('delete_user.html', existing_user=existing_user)
 
 @app.post('/users/<int:user_id>/delete')
@@ -270,15 +270,14 @@ def delete_user(user_id: int):
     if not(username and password and checkbox):
         abort(400)
     
-    existing_user = User.query.filter_by(username=username).first()
+    existing_user = user_repository_singleton.get_user_by_id(user_id)
     if not existing_user: 
         abort(401)
 
     if not bcrypt.check_password_hash(existing_user.password, password):
         abort(401)
 
-    db.session.delete(existing_user)
-    db.session.commit()
+    user_repository_singleton.delete_user(existing_user)
     del session['username']
     del session['user_id']
     return redirect('/login')
@@ -288,13 +287,13 @@ def delete_user(user_id: int):
 def edit_post_form(post_id: int):
     if 'user_id' not in session:
         abort(401)
-    existing_post = Post2.query.filter_by(post_id=post_id).first()
+    existing_post = post_repository_singleton.get_post_by_id(post_id)
     if not existing_post:
         abort(404)
-    if post_id != existing_post.post_id:
-        abort(401)        
-    if existing_post.author_id != session['user_id']:
-        abort(401)
+    if existing_post.post_id != post_id:
+        abort(403)        
+    if existing_post.author_id != session.get('user_id'):
+        abort(403)
     return render_template('edit_post_form.html', existing_post=existing_post)
 
 @app.post('/posts/<int:post_id>')
@@ -303,14 +302,10 @@ def edit_post(post_id: int):
     content = request.form.get('content')
     community_name = request.form.get('community-name')
 
-    existing_post = Post2.query.filter_by(post_id=post_id).first()
+    existing_post = post_repository_singleton.get_post_by_id(post_id)
     if not existing_post:
         abort(404)
 
-    existing_post.title = title
-    existing_post.content = content
-    existing_post.community_name = community_name
-    db.session.commit()
     return redirect('/secret')
 
 # Deleting posts
@@ -318,22 +313,21 @@ def edit_post(post_id: int):
 def get_delete_post_page(post_id: int):
     if 'user_id' not in session:
         abort(401)
-    existing_post = Post2.query.filter_by(post_id=post_id).first()
+    existing_post = post_repository_singleton.get_post_by_id(post_id)
     if not existing_post:
         abort(404)
-    if post_id != existing_post.post_id:
-        abort(401)        
-    if existing_post.author_id != session['user_id']:
-        abort(401)
+    if existing_post.post_id != post_id:
+        abort(403)        
+    if existing_post.author_id != session.get('user_id'):
+        abort(403)
     return render_template('delete_post.html', existing_post=existing_post)
 
 @app.post('/posts/<int:post_id>/delete')
 def delete_post(post_id: int):
-    existing_post = Post2.query.filter_by(post_id=post_id).first()
+    existing_post = post_repository_singleton.get_post_by_id(post_id)
     if not existing_post:
         abort(404)
     
-    db.session.delete(existing_post)
-    db.session.commit()
+    post_repository_singleton.delete_post(post_id)
     return redirect('/secret')
 

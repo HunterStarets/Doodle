@@ -3,7 +3,7 @@
 {% block body %}
 <div class="container">
   <h1 class="mt-3">Edit Account</h1>
-  <form action="/users/{{ user_id }}" method="post">
+  <form action="/users/{{ existing_user.user_id }}" method="post">
       <div class="mb-3">
           <label for="email" class="form-label">Email address</label>
           <input type="email" class="form-control" id="email" name="email" value="{{ existing_user.email }}">
