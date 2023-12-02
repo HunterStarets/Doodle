@@ -273,10 +273,45 @@ def delete_user(user_id: int):
     existing_user = User.query.filter_by(username=username).first()
     if not existing_user: 
         abort(401)
+
     if not bcrypt.check_password_hash(existing_user.password, password):
         abort(401)
+
     db.session.delete(existing_user)
     db.session.commit()
     del session['username']
     del session['user_id']
     return redirect('/login')
+
+# Edit posts
+@app.get('/posts/<int:post_id>/edit')
+def edit_post_form(post_id: int):
+    if 'user_id' not in session:
+        abort(401)
+    existing_post = Post2.query.filter_by(post_id=post_id).first()
+    if not existing_post:
+        abort(404)
+    if post_id != existing_post.post_id:
+        abort(401)        
+    if existing_post.author_id != session['user_id']:
+        abort(401)
+    return render_template('edit_post_form.html', existing_post=existing_post)
+
+@app.post('/posts/<int:post_id>')
+def edit_post(post_id: int):
+    title = request.form.get('title')
+    content = request.form.get('content')
+    community_name = request.form.get('community-name')
+
+    existing_post = Post2.query.filter_by(post_id=post_id).first()
+    if not existing_post:
+        abort(404)
+
+    existing_post.title = title
+    existing_post.content = content
+    existing_post.community_name = community_name
+    db.session.commit()
+    return redirect('/secret')
+
+
+
