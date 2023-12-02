@@ -313,5 +313,27 @@ def edit_post(post_id: int):
     db.session.commit()
     return redirect('/secret')
 
+# Deleting posts
+@app.get('/posts/<int:post_id>/delete')
+def get_delete_post_page(post_id: int):
+    if 'user_id' not in session:
+        abort(401)
+    existing_post = Post2.query.filter_by(post_id=post_id).first()
+    if not existing_post:
+        abort(404)
+    if post_id != existing_post.post_id:
+        abort(401)        
+    if existing_post.author_id != session['user_id']:
+        abort(401)
+    return render_template('delete_post.html', existing_post=existing_post)
 
+@app.post('/posts/<int:post_id>/delete')
+def delete_post(post_id: int):
+    existing_post = Post2.query.filter_by(post_id=post_id).first()
+    if not existing_post:
+        abort(404)
+    
+    db.session.delete(existing_post)
+    db.session.commit()
+    return redirect('/secret')
 

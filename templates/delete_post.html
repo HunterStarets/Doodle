@@ -1,0 +1,14 @@
+{% extends '_template.html' %}
+
+{% block body %}
+<div class="container">
+    <h3>post_id: {{ existing_post.post_id }}</h3>
+    <h3>post_title: {{ existing_post.title }}</h3>
+    <h3>post_content: {{ existing_post.content }}</h3>
+    <h3>post_community_name: {{ existing_post.community_name }}</h3>
+    <form action="/posts/{{ existing_post.post_id }}/delete" method="post">
+        <button type="submit" class="btn btn-primary">Delete post</button>
+    </form>
+</div>
+
+{% endblock %}
