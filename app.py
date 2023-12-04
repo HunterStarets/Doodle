@@ -126,26 +126,25 @@ def signup():
     if not (email and username and raw_password and first_name and last_name): 
         abort(400)
 
-    existing_email = User.query.filter_by(email=email).first()
+    existing_email = user_repository_singleton.get_user_by_email(email)
     if existing_email:
         abort(400)
 
-    existing_username = User.query.filter_by(username=username).first()
+    existing_username = user_repository_singleton.get_user_by_username(username)
     if existing_username:
         abort(400)
 
     hashed_password = bcrypt.generate_password_hash(raw_password, 12).decode()
-    new_user = User(email, username, hashed_password, first_name, last_name)
-    db.session.add(new_user)
-    db.session.commit()
-    session['username'] = username
+
+    new_user = user_repository_singleton.create_user(email, username, hashed_password, first_name, last_name)
     session['user_id'] = new_user.user_id
+    session['username'] = username
     return redirect('/secret')
 
 # User login
 @app.get('/login')
 def get_login_page():
-    if 'username' in session:
+    if 'user_id' in session and 'username' in session:
         return redirect('/secret')
     return render_template('login.html')
 
@@ -155,15 +154,19 @@ def login():
     raw_password = request.form.get('password')
     if not username or not raw_password:   
         abort(401)
-    existing_user = User.query.filter_by(username=username).first()
+
+    existing_user = user_repository_singleton.get_user_by_username(username)
     if not existing_user: 
         abort(401)
+
     if not bcrypt.check_password_hash(existing_user.password, raw_password):
         abort(401)
-    session['username'] = username
+
     session['user_id'] = existing_user.user_id
+    session['username'] = username
     return redirect('/secret')
 
+# Logout user
 @app.post('/logout')
 def logout():
     del session['user_id']
@@ -172,7 +175,7 @@ def logout():
 
 @app.get('/secret')
 def get_secret_page():
-    if 'user_id' not in session:
+    if 'user_id' not in session or 'username' not in session:
         abort(401)
     return render_template('secret.html', username=session['username'])
 
@@ -180,7 +183,7 @@ def get_secret_page():
 # Creating posts
 @app.get('/posts/new')
 def create_post_form():
-    if 'user_id' not in session:
+    if 'user_id' not in session or 'username' not in session:
         abort(401)
     return render_template('create_post_form.html')
 
@@ -207,7 +210,7 @@ def create_post():
 # Edit user
 @app.get('/users/<int:user_id>/edit')
 def edit_user_form(user_id: int):
-    if 'user_id' not in session:
+    if 'user_id' not in session or 'username' not in session:
         abort(401)
     if session['user_id'] != user_id:
         abort(403)
@@ -232,12 +235,12 @@ def edit_user(user_id: int):
         abort(401)
 
     if email != existing_user.email: 
-        existing_email = User.query.filter_by(email=email).first()
+        existing_email = user_repository_singleton.get_user_by_email(email)
         if existing_email:
             abort(400)
 
     if username != existing_user.username:
-        existing_username = User.query.filter_by(username=username).first()
+        existing_username = user_repository_singleton.get_user_by_username(username)
         if existing_username:
             abort(400)
 
@@ -254,7 +257,7 @@ def edit_user(user_id: int):
 # Delete user 
 @app.get('/users/<int:user_id>/delete')
 def get_delete_user_page(user_id: int):
-    if 'user_id' not in session:
+    if 'user_id' not in session or 'username' not in session:
         abort(401)
     if session['user_id'] != user_id:
         abort(403)
@@ -285,7 +288,7 @@ def delete_user(user_id: int):
 # Edit posts
 @app.get('/posts/<int:post_id>/edit')
 def edit_post_form(post_id: int):
-    if 'user_id' not in session:
+    if 'user_id' not in session or 'username' not in session:
         abort(401)
     existing_post = post_repository_singleton.get_post_by_id(post_id)
     if not existing_post:
@@ -311,7 +314,7 @@ def edit_post(post_id: int):
 # Deleting posts
 @app.get('/posts/<int:post_id>/delete')
 def get_delete_post_page(post_id: int):
-    if 'user_id' not in session:
+    if 'user_id' not in session or 'username' not in session:
         abort(401)
     existing_post = post_repository_singleton.get_post_by_id(post_id)
     if not existing_post:

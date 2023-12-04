@@ -21,5 +21,9 @@ class PostRepository:
         db.session.delete(existing_post)
         db.session.commit()
 
+    def get_all_posts_by_author_id(self, existing_user):
+        posts = Post2.query.filter_by(author_id=existing_user.user_id).all()
+        return posts
+
 # Singleton to be used in other modules
 post_repository_singleton = PostRepository()

@@ -1,7 +1,22 @@
-from src.models import db, User
+from src.models import db, User, Post2
+from src.repositories.post_repository import post_repository_singleton
 
 class UserRepository:
 
+    def create_user(self, email, username, password, first_name, last_name):
+        new_user = User(email, username, password, first_name, last_name)
+        db.session.add(new_user)
+        db.session.commit()
+        return new_user
+
+    def get_user_by_username(self, username):
+        user = User.query.filter_by(username=username).first()
+        return user
+    
+    def get_user_by_email(self, email):
+        user = User.query.filter_by(email=email).first()
+        return user
+    
     def get_user_by_id(self, user_id):
         user = User.query.filter_by(user_id=user_id).first()
         return user
@@ -15,6 +30,10 @@ class UserRepository:
         db.session.commit()
 
     def delete_user(self, existing_user) -> None:
+        user_posts = post_repository_singleton.get_all_posts_by_author_id(existing_user.user_id)
+        for post in user_posts:
+            post_repository_singleton.delete_post(post)
+
         db.session.delete(existing_user)
         db.session.commit()
 
