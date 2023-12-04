@@ -1,13 +1,8 @@
-from src.models import db, User, Post2
+from src.models import db, User
 from src.repositories.post_repository import post_repository_singleton
+from sqlalchemy import func
 
 class UserRepository:
-
-    def create_user(self, email, username, password, first_name, last_name):
-        new_user = User(email, username, password, first_name, last_name)
-        db.session.add(new_user)
-        db.session.commit()
-        return new_user
 
     def get_user_by_username(self, username):
         user = User.query.filter_by(username=username).first()
@@ -20,6 +15,12 @@ class UserRepository:
     def get_user_by_id(self, user_id):
         user = User.query.filter_by(user_id=user_id).first()
         return user
+    
+    def create_user(self, email, username, password, first_name, last_name):
+        new_user = User(email, username, password, first_name, last_name)
+        db.session.add(new_user)
+        db.session.commit()
+        return new_user
     
     def edit_user(self, existing_user, email, username, password, first_name, last_name) -> None:
         existing_user.email = email
@@ -37,5 +38,10 @@ class UserRepository:
         db.session.delete(existing_user)
         db.session.commit()
 
+    # Reference: module-15-assignment
+    def search_users(self, username):
+        found_user = User.query.filter(func.lower(User.username).like(func.lower(f'%{username}%'))).first()
+        return found_user
+    
 # Singleton to be used in other modules
 user_repository_singleton = UserRepository()

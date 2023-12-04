@@ -256,13 +256,13 @@ def edit_user(user_id: int):
 
 # Delete user 
 @app.get('/users/<int:user_id>/delete')
-def get_delete_user_page(user_id: int):
+def delete_user_form(user_id: int):
     if 'user_id' not in session or 'username' not in session:
         abort(401)
     if session['user_id'] != user_id:
         abort(403)
     existing_user = user_repository_singleton.get_user_by_id(user_id)
-    return render_template('delete_user.html', existing_user=existing_user)
+    return render_template('delete_user_form.html', existing_user=existing_user)
 
 @app.post('/users/<int:user_id>/delete')
 def delete_user(user_id: int):
@@ -313,7 +313,7 @@ def edit_post(post_id: int):
 
 # Deleting posts
 @app.get('/posts/<int:post_id>/delete')
-def get_delete_post_page(post_id: int):
+def delete_post_form(post_id: int):
     if 'user_id' not in session or 'username' not in session:
         abort(401)
     existing_post = post_repository_singleton.get_post_by_id(post_id)
@@ -323,7 +323,7 @@ def get_delete_post_page(post_id: int):
         abort(403)        
     if existing_post.author_id != session.get('user_id'):
         abort(403)
-    return render_template('delete_post.html', existing_post=existing_post)
+    return render_template('delete_post_form.html', existing_post=existing_post)
 
 @app.post('/posts/<int:post_id>/delete')
 def delete_post(post_id: int):
@@ -334,3 +334,12 @@ def delete_post(post_id: int):
     post_repository_singleton.delete_post(post_id)
     return redirect('/secret')
 
+# Search users
+#Reference: module-15-assignment
+@app.get('/users/search')
+def search_users():
+    found_user = None
+    q = request.args.get('q', '')
+    if q != '':
+        found_user = user_repository_singleton.search_users(q)
+    return render_template('search_users.html', user=found_user)
