@@ -1,17 +1,17 @@
-{% if user %}
+{% if 'user_id' in session and 'username' in session %}
 <div class="card">
-    <img src="{{ user.profile_picture }}" class="card-img-top" alt="{{ user.username }}'s profile picture">
+    <img src="https://t3.ftcdn.net/jpg/00/64/67/52/240_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg" class="card-img-top" alt="{{ user.username }}'s profile picture">
     <div class="card-body">
         <h5 class="card-title">{{ user.username }}</h5>
-        <p class="card-text">{{ user.summary }}</p>
-        <a href="{{ url_for('create_post_form')}}" class="btn btn-primary" style="width:100%; margin-top:10px;">Submit a
-            new
-            post</a>
-
+        <p class="card-text">{{ user.email}}</p>
+        <p class="card-text">{{ user.first_name}} {{ user.last_name }}</p>
+        <a href="/posts/new" class="btn btn-primary" style="width:100%; margin-top:10px;">Submit a new post</a>
+        <a href="/users/{{ user.user_id }}/edit" class="btn btn-primary" style="width:100%; margin-top:10px;">Edit Account</a>
+        <a href="/users/{{ user.user_id }}/delete"  class="btn btn-danger" style="width:100%; margin-top:10px;">Delete Account</a>
     </div>
 </div>
 {% else %}
-<div class="card">
+<!-- <div class="card">
     <div class="card-body">
         <h5 class="card-title">Login</h5>
         <form action="/login" method="post">
@@ -32,5 +32,5 @@
         </form>
     </div>
 
-</div>
+</div> -->
 {% endif %}
