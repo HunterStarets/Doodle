@@ -8,8 +8,6 @@ last_name VARCHAR(255) NOT NULL,
 PRIMARY KEY (user_id)
 );
 
-SELECT * FROM app_user;
-
 CREATE TABLE IF NOT EXISTS post (
     post_id SERIAL,
     title VARCHAR(255) NOT NULL,
@@ -22,4 +20,15 @@ CREATE TABLE IF NOT EXISTS post (
     FOREIGN KEY (author_id) REFERENCES app_user(user_id)
 );
 
-SELECT * FROM post;
+CREATE TABLE IF NOT EXISTS comment (
+    comment_id SERIAL,
+    timestamp TIMESTAMP NOT NULL,
+    content TEXT NOT NULL,
+    points INT DEFAULT 0,
+    author_id INT,
+    post_id INT,
+    PRIMARY KEY (comment_id),
+    FOREIGN KEY (author_id) REFERENCES app_user(user_id)
+    FOREIGN KEY (post_id) REFERENCES post(post_id)
+);
+

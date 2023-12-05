@@ -5,18 +5,18 @@
   <h1 class="mt-3">Edit Post</h1>
   <form action="/posts/{{ existing_post.post_id }}" method="post">
     <div class="mb-3">
-        <label for="title" class="form-label">Title *</label>
+        <label for="title" class="form-label">Title</label>
         <input type="text" id="title" name="title" class="form-control" value="{{ existing_post.title }}" required>
     </div>
     <div class="mb-3">
-        <label for="content" class="form-label">Content *</label>
+        <label for="content" class="form-label">Content</label>
         <div class="form-floating">
-            <textarea id="content" name="content" class="form-control" style="height: 100px" required>{{ existing_post.content }} </textarea>
+            <textarea id="content" name="content" class="form-control" style="height: 100px" required>{{ existing_post.content }}</textarea>
         </div>
     </div>
     <div class="mb-3">
-        <label for="community-name" class="form-label">Community Name (optional)</label>
-        <input type="text" id="community-name" name="community-name" class="form-control" value="{{ existing_post.community_name }}">
+        <label for="community-name" class="form-label">Community Name</label>
+        <input type="text" id="community-name" name="community-name" class="form-control" value="{{ existing_post.community_name }}" required>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>

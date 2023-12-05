@@ -34,15 +34,6 @@ posts = [
     Post("Post Title 3", "user1", "d/community1", ["comment1", "comment2"], ["upvote1"], ["downvote1", "downvote2"], 2, "Vitae purus faucibus ornare suspendisse sed. Eu feugiat pretium nibh ipsum consequat nisl vel. Interdum consectetur libero id faucibus nisl. Condimentum vitae sapien pellentesque habitant. Non nisi est sit amet facilisis magna etiam tempor orci."),
 ]
 
-# View single post
-@app.get('/view_post/<post_id>')
-def view_post(post_id):
-    #temporary
-    post = find_post_by_id(post_id)
-
-    #final render
-    return render_template('view_post.html', post=post)
-
 # @app.route('/')
 # def index():
 #     #mock test data
@@ -260,7 +251,7 @@ def edit_user(user_id: int):
 # Delete user 
 @app.get('/users/<int:user_id>/delete')
 def delete_user_form(user_id: int):
-    if 'user_id' not in session or 'username' not in session:
+    if 'user_id' not in session and 'username' not in session:
         abort(401)
     if session['user_id'] != user_id:
         abort(403)
@@ -311,7 +302,7 @@ def edit_post(post_id: int):
     existing_post = post_repository_singleton.get_post_by_id(post_id)
     if not existing_post:
         abort(404)
-
+    post_repository_singleton.edit_post(existing_post, title, content, community_name)
     return redirect('/secret')
 
 # Deleting posts
@@ -347,10 +338,20 @@ def search_users():
         found_user = user_repository_singleton.search_users(q)
     return render_template('search_users.html', user=found_user)
 
+# Home page
 @app.route('/')
 def index():
-    #mock test data
     user = None 
     user = user_repository_singleton.get_user_by_id(session.get('user_id'))    
-    #final render
     return render_template('index.html', home_active=True, user=user, posts=posts)
+
+# View single post
+@app.get('/posts/<int:post_id>')
+def get_single_post(post_id:int):
+    existing_post = post_repository_singleton.get_post_by_id(post_id)
+    if not existing_post:
+        abort(404)
+    author = user_repository_singleton.get_user_by_id(existing_post.author_id)
+    if not author:
+        abort(404)
+    return render_template('get_single_post.html', existing_post=existing_post, author=author)
