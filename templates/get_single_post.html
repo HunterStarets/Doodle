@@ -33,11 +33,11 @@
     </div>
     <!-- REPLY TO POST CONTAINER-->
     <div id="reply-post-container" hidden>
-        <form>
+        <form action="/comments" method="post">
             <div class="form-floating mb-3">
-                <textarea class="form-control" id="reply-post" placeholder="Leave a comment here"
-                    style="height: 100px"></textarea>
-                <label for="reply-post">Comments</label>
+                <textarea class="form-control" id="comment" name="comment" placeholder="Leave a comment here" style="height: 100px"></textarea>
+                <label for="comment">Comments</label>
+                <input type="hidden" name="post-id" value="{{ existing_post.post_id }}">
             </div>
             <button type="button" class="cancel-button btn btn-primary mb-3 me-2">Cancel</button>
             <button type="submit" class="submit-button btn btn-primary mb-3">Submit</button>

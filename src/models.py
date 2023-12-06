@@ -52,7 +52,7 @@ class Comment(db.Model):
     content = db.Column(db.Text, nullable=False)
     points = db.Column(db.Integer, nullable=True, default=0)
     author_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
-    author = db.relationship('User', backref='posts', lazy=True, primaryjoin="Comment.author_id == User.user_id")
+    author = db.relationship('User', backref='comments', lazy=True, primaryjoin="Comment.author_id == User.user_id")
     post_id = db.Column(db.Integer, db.ForeignKey('post.post_id'), nullable=False)
     post = db.relationship('Post2', backref='comments', lazy=True, primaryjoin="Comment.post_id == Post2.post_id")
 

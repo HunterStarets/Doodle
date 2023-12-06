@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, abort, redirect, session
+from flask import Flask, render_template, request, abort, redirect, session, url_for
 from flask_bcrypt import Bcrypt
 from datetime import datetime
 
 from src.repositories.post_repository import post_repository_singleton
+from src.repositories.comment_repository import comment_repository_singleton
 from src.repositories.user_repository import user_repository_singleton
 from src.models import db, User, Post2
 
@@ -355,3 +356,24 @@ def get_single_post(post_id:int):
     if not author:
         abort(404)
     return render_template('get_single_post.html', existing_post=existing_post, author=author)
+
+#Create comment
+@app.post('/comments')
+def create_comment():
+    comment_content = request.form.get('comment')
+    post_id = request.form.get('post-id')
+    timestamp = datetime.utcnow()
+    points = 0
+
+    if not (comment_content):
+        abort(400)
+
+    user_id = session.get('user_id')
+    user = user_repository_singleton.get_user_by_id(user_id)
+
+    if not (user_id and user and post_id):    
+        abort(401)
+
+    author_id = user.user_id
+    comment_repository_singleton.create_comment(timestamp, comment_content, points, author_id, post_id)
+    return redirect(url_for('get_single_post', post_id=post_id))
