@@ -12,20 +12,38 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     first_name = db.Column(db.String(255), nullable=False)
     last_name = db.Column(db.String(255), nullable=False)
-    profile_picture = db.Column(db.TEXT, nullable=False)
-    summary = db.Column(db.TEXT, nullable=False)
+    bio = db.Column(db.TEXT, nullable=False)
 
+    def __init__(self, email: str, username: str, password: str, first_name: str, last_name: str, bio:str) -> None:
+        self.email = email
+        self.username = username
+        self.password = password
+        self.first_name = first_name
+        self.last_name = last_name
+        self.bio = bio
 
+    def __repr__(self) -> str:
+        return f'User({self.user_id}, {self.email}, {self.username}, {self.password}, {self.first_name}, {self.last_name})'
 
 class Post2(db.Model):
     __tablename__ = 'post'
 
     post_id = db.Column(db.Integer, primary_key=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
     title = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
     community_name = db.Column(db.String(255), nullable=False) 
+    timestamp = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
+    author_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
+
+    def __init__(self, title: str, content: str, community_name: str, timestamp: datetime, author_id: int) -> None:
+        self.title = title
+        self.content = content
+        self.community_name = community_name
+        self.timestamp = timestamp
+        self.author_id = author_id
+
+    def __repr__(self) -> str:
+        return f'Post({self.post_id}, {self.title}, {self.content}, {self.community_name}, {self.timestamp}, {self.author_id})'
     
 # Comment Model
 class Comment(db.Model):
