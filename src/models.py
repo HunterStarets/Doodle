@@ -35,20 +35,23 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('post.post_id'), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    
-    def __repr__(self):
-        return f'<Comment {self.comment_id}>'
+    timestamp = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
 
 # Vote Model
-class Vote(db.Model):
-    __tablename__ = 'vote'
+class PostVote(db.Model):
+    __tablename__ = 'post_vote'
     
     vote_id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('post.post_id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
+    voter_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
     is_upvote = db.Column(db.Boolean, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __repr__(self):
-        return f'<Vote {self.vote_id}: {"Upvote" if self.is_upvote else "Downvote"}>'
+class CommentVote(db.Model):
+    __tablename__ = 'comment_vote'
+
+    vote_id = db.Column(db.Integer, primary_key=True)
+    comment_id = db.Column(db.Integer, db.ForeignKey('comment.comment_id'), nullable=False)
+    voter_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
+    is_upvote = db.Column(db.Boolean, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

@@ -4,14 +4,17 @@
 <!--HEADER-->
 <div>
     <h1 class="text-center bg-secondary text-white p-5 mb-4">{{
-        post.community }}</h1>
+        post.community_name }}</h1>
 </div>
 <!-- POST AND ADD A COMMENT -->
 <div class="container vote bg-light mb-4 pt-4 px-4">
     <!-- POST-->
-    <p class="mb-2"><strong class="pe-2">{{post.title}}</strong><span class="points">{{post.net_upvotes()}}</span>
+    <p class="mb-2"><strong class="pe-2">{{post.title}}</strong><span
+            class="points">{{app_repository_singleton.get_net_post_votes(post.post_id)}}</span>
         points</p>
-    <p class="mb-2">Submitted {{ post.submitted_time }} hours ago<a href="#">{{ post.submitter }}</a></p>
+    <p class="mb-2">Submitted {{ post.timestamp }} by {{
+        app_repository_singleton.get_user_by_id(post.author_id).username
+        }}</p>
     <div id="edit-post-container">
         <form>
             <textarea id="post-textarea" class="form-control mb-2" style="min-height: 125px; background-color: white;"
@@ -39,12 +42,13 @@
     </div>
     <!-- REPLY TO POST CONTAINER-->
     <div id="reply-post-container" hidden>
-        <form>
+        <form action="/comments" method="post">
             <div class="form-floating mb-3">
-                <textarea class="form-control" id="reply-post" placeholder="Leave a comment here"
-                    style="height: 100px"></textarea>
-                <label for="reply-post">Comments</label>
+                <textarea id="content" name="content" class="form-control" style="height: 100px"
+                    placeholder="Leave a comment here" style="height: 100px" required></textarea>
+                <label for="content">Comments</label>
             </div>
+            <input type="hidden" name="post_id" value="{{ post.post_id }}">
             <button type="button" class="cancel-button btn btn-primary mb-3 me-2">Cancel</button>
             <button type="submit" class="submit-button btn btn-primary mb-3">Submit</button>
         </form>
@@ -58,6 +62,7 @@
 {% include 'list_comments.html' %}
 
 <script>
+    /*
     const voteContainers = document.querySelectorAll(".vote");
 
     voteContainers.forEach(container => {
@@ -99,6 +104,7 @@
             }
         });
     });
+    */
 </script>
 
 <script>
