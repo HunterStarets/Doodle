@@ -1,23 +1,26 @@
 <div class="container comment vote bg-light px-4 pt-2">
     <div class="d-flex flex-row">
-        <a href="#" class="pe-3 mb-2">{{ comment.submitter }}</a>
-        <p class="pe-3 mb-2"><span class="points">{{ comment.net_upvotes() }}</span> points</p>
-        <p class="pe-3 mb-2">1 hour ago</p>
+        <p class="pe-3 mb-2"><strong>{{ app_repository_singleton.get_user_by_id(comment.author_id).username }}</strong>
+        </p>
+        <p class="pe-3 mb-2"><span class="points">{{ app_repository_singleton.get_net_comment_votes(comment.comment_id)
+                }}</span> points</p>
+        <p class="pe-3 mb-2">Submitted {{ comment.timestamp }}</p>
     </div>
     <div class="edit-comment-container">
         <p class="mb-2">{{ comment.content }}</p>
         <form hidden>
-            <textarea id="edit-comment" class="form-control mb-2" style="min-height: 125px; background-color: white;" required>Lorem</textarea>
+            <textarea id="edit-comment" class="form-control mb-2" style="min-height: 125px; background-color: white;"
+                required>Lorem</textarea>
             <label for="edit-comment"></label>
-            <button type="button" class="cancel-button btn btn-primary mt-2 mb-3 me-2" >Cancel</button>
-            <button type="submit" class="submit-button btn btn-primary mt-2 mb-3" >Submit</button>
+            <button type="button" class="cancel-button btn btn-primary mt-2 mb-3 me-2">Cancel</button>
+            <button type="submit" class="submit-button btn btn-primary mt-2 mb-3">Submit</button>
         </form>
     </div>
     <div class="d-flex flex-row pb-3">
         <div class="px-2">
             <button class="btn btn-light bg-transparent upvote-button border-0 p-0">
                 <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
-            </button>  
+            </button>
             <button class="btn btn-light bg-transparent downvote-button border-0 p-0">
                 <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
             </button>
@@ -30,10 +33,10 @@
     <div class="reply-comment-container" hidden>
         <form>
             <div class="form-floating mb-3">
-                <textarea class="form-control" id="reply-comment" placeholder="Leave a comment here" 
-                style="height: 100px" required></textarea>
+                <textarea class="form-control" id="reply-comment" placeholder="Leave a comment here"
+                    style="height: 100px" required></textarea>
                 <label for="reply-comment">Comments</label>
-            </div>  
+            </div>
             <button type="button" class="cancel-button btn btn-primary mb-3 me-2">Cancel</button>
             <button type="submit" class="submit-button btn btn-primary mb-3">Submit</button>
         </form>
@@ -49,17 +52,17 @@
         const replyLink = container.querySelector('.reply-comment-link');
         const editLink = container.querySelector('.edit-comment-link');
 
-        replyLink.addEventListener('click', function() {
+        replyLink.addEventListener('click', function () {
             event.preventDefault();
             replyToCommentContainer.removeAttribute('hidden');
-            
+
             const cancelButton = replyToCommentContainer.querySelector('.cancel-button');
-            cancelButton.addEventListener("click", function() {
+            cancelButton.addEventListener("click", function () {
                 replyToCommentContainer.setAttribute('hidden', true);
             });
         });
 
-        editLink.addEventListener('click', function() {
+        editLink.addEventListener('click', function () {
             event.preventDefault();
             const paragraphText = editCommentContainer.querySelector('p');
             paragraphText.setAttribute('hidden', true);
@@ -69,12 +72,12 @@
 
             const textarea = editCommentContainer.querySelector('textarea');
             textarea.focus();
-            
+
             const cancelButton = editCommentContainer.querySelector('.cancel-button');
-            cancelButton.addEventListener("click", function() {
+            cancelButton.addEventListener("click", function () {
                 editCommentForm.setAttribute('hidden', true);
                 paragraphText.removeAttribute('hidden');
             });
-        });        
+        });
     });
 </script>
