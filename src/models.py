@@ -12,54 +12,20 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     first_name = db.Column(db.String(255), nullable=False)
     last_name = db.Column(db.String(255), nullable=False)
-    profile_picture = content = db.Column(db.Text, nullable=False)
+    profile_picture = db.Column(db.TEXT, nullable=False)
+    summary = db.Column(db.TEXT, nullable=False)
 
-    def __init__(self, email: str, username: str, password: str, first_name: str, last_name: str, profile_picture: str) -> None:
-        self.email = email
-        self.username = username
-        self.password = password
-        self.first_name = first_name
-        self.last_name = last_name
-        self.profile_picture_url = profile_picture
 
-    def __repr__(self) -> str:
-        return f'User({self.user_id}, {self.email}, {self.username}, {self.password}, {self.first_name}, {self.last_name})'
-
-    @classmethod
-    def get_user_by_id(cls, user_id: int):
-        return cls.query.get(user_id)
-    
 
 class Post2(db.Model):
     __tablename__ = 'post'
 
     post_id = db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
-
     title = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
     community_name = db.Column(db.String(255), nullable=False) 
-    
-    
-
-    def __init__(self, author_id: int, title: str, content: str, timestamp: datetime, community_name: str):
-        self.title = title
-        self.content = content
-        self.timestamp = timestamp or datetime.utcnow()
-        self.author_id = author_id
-        self.community_name = community_name
-
-    def __repr__(self) -> str:
-        return f'Post2({self.post_id}, "{self.title}", "{self.content}", "{self.community_name}", "{self.timestamp}", {self.author_id})'
-
-    def net_upvotes(self):
-        return db.session.query(db.func.count(Vote.vote_id)).filter(Vote.post_id == self.post_id, Vote.is_upvote == True).scalar() - \
-               db.session.query(db.func.count(Vote.vote_id)).filter(Vote.post_id == self.post_id, Vote.is_upvote == False).scalar()
-
-    @classmethod
-    def get_all_posts(cls):
-        return cls.query.all()
     
 # Comment Model
 class Comment(db.Model):

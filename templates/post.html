@@ -11,7 +11,7 @@
     <div class="d-flex flex-column" style="margin-left: 20px;">
         <p class="mb-2"><strong class="pe-2"><a href="{{ url_for('view_post', post_id=post.id) }}">{{ post.title
                     }}</a></strong>{{
-            post.net_upvotes() }} points</p>
+            app_repository_singleton.get_net_upvotes(post.post_id) }} points</p>
         <p class="mb-2">Submitted {{ post.submitted_time }} by <a href="">{{ post.submitter }}</a> to <a href="">{{
                 post.community }}</a></p>
 
