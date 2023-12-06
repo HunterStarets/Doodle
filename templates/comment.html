@@ -1,11 +1,14 @@
+{% extends '_template.html' %}
+
+{% block body %}
 <div class="container vote bg-light px-4 pt-2">
     <div class="d-flex flex-row">
-        <a href="#" class="pe-3">{{ comment.submitter }}</a>
-        <p class="pe-3"><span class="points">{{ comment.net_upvotes() }}</span> points</p>
+        <a href="#" class="pe-3">hi</a>
+        <p class="pe-3"><span class="points">0</span> points</p>
         
     </div>
     <div>
-        <p>{{ comment.content }}</p>
+        <p> hi </p>
     </div>
     <div class="d-flex flex-row pb-3">
         <div class="px-2">
@@ -31,3 +34,4 @@
         </form>
     </div>
 </div>
+{% endblock %}
