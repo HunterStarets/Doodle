@@ -6,6 +6,7 @@ from post import Post
 from comment import Comment
 from src.models import db, User, Post2
 from dotenv import load_dotenv
+from src.repositories.app_repository import app_repository_singleton
 import os
 
 load_dotenv()
@@ -33,21 +34,19 @@ posts = [
 @app.route('/')
 def index():
     #mock test data
-    if 'user_id' not in session:
-        user = None 
-    else: 
-        user = User.get_user_by_id(session['user_id'])
+    app_repository_singleton.get_all_posts()
+    user = None
+    if 'user_id' in session:
+        user = app_repository_singleton.get_user_by_id(session['user_id'])
 
-    #user = {'username': 'johndoe', 'profile_picture': 'https://t3.ftcdn.net/jpg/00/64/67/52/240_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg', 'summary': 'Short bio'}
+    posts = app_repository_singleton.get_all_posts()
     
-    #final render
-    posts = Post2.get_all_posts()
-    return render_template('index.html', home_active=True, user=user, posts=posts)
+    return render_template('index.html', home_active=True, user=user, posts=posts, app_repository_singleton=app_repository_singleton)
 
 @app.get('/view_post/<post_id>')
 def view_post(post_id):
     #temporary
-    post = find_post_by_id(post_id)
+    post = app_repository_singleton.get_post_by_id
 
     #final render
     return render_template('view_post.html', post=post)
@@ -139,10 +138,16 @@ def signup():
     if existing_username:
         abort(400)
     hashed_password = bcrypt.generate_password_hash(raw_password, 12).decode()
-    new_user = User(email, username, hashed_password, first_name, last_name)
-    db.session.add(new_user)
-    db.session.commit()
+
+    ##mock data
+    profile_picture='https://t3.ftcdn.net/jpg/00/64/67/52/240_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg'
+    summary='testing description'
+    ##end mock data
+    
+    new_user = app_repository_singleton.create_user(email, username, hashed_password, first_name, last_name, profile_picture, summary)
+    
     session['username'] = username
+    session['user_id'] = new_user.user_id
     return redirect('/secret')
 
 @app.post('/login')
@@ -163,6 +168,7 @@ def login():
 @app.post('/logout')
 def logout():
     del session['username']
+    del session['user_id']
     return redirect('/login')
 
 @app.get('/secret')
@@ -183,14 +189,14 @@ def create_post():
     title = request.form.get('title')
     content = request.form.get('content')
     community_name = request.form.get('community-name')
-    timestamp = datetime.utcnow()
     author_id = session['user_id']
-    user = User.query.filter_by(user_id=author_id).first()
+
+    user = app_repository_singleton.get_user_by_id(author_id)
+    #user = User.query.filter_by(user_id=author_id).first()
     
     if not (title and content and author_id and user):
         abort(400)
  
-    new_post = Post2(author_id, title, content, timestamp, community_name, author_id) # type: ignore
-    db.session.add(new_post)
-    db.session.commit()
-    return redirect('/secret')
+    new_post = app_repository_singleton.create_post(author_id, title, content, community_name)
+
+    return redirect('/')
