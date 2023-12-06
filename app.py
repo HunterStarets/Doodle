@@ -43,13 +43,13 @@ def index():
     
     return render_template('index.html', home_active=True, user=user, posts=posts, app_repository_singleton=app_repository_singleton)
 
-@app.get('/view_post/<post_id>')
+@app.get('/posts/<int:post_id>')
 def view_post(post_id):
     #temporary
-    post = app_repository_singleton.get_post_by_id
+    post = app_repository_singleton.get_post_by_id(post_id)
 
     #final render
-    return render_template('view_post.html', post=post)
+    return render_template('view_post.html', post=post, app_repository_singleton=app_repository_singleton)
  
 @app.get('/view_profile')
 def view_profile():
@@ -69,15 +69,6 @@ def view_profile():
     
     return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts)
 
-#TEMPORARY TESTING FUNCTION
-def find_post_by_id(post_id):
-    post_id = int(post_id)
-    try:
-        post = posts[post_id]
-    except:
-        post = Post("Imaginary Post", "user1", "d/community1", ["comment1", "comment2"], ["upvote1"], ["downvote1", "downvote2"], -1, "Nisl condimentum id venenatis a condimentum. Enim neque volutpat ac tincidunt. At tempor commodo ullamcorper a lacus vestibulum sed. Commodo viverra maecenas accumsan lacus."),
-    
-    return post
 
 @app.get('/user_saved_posts')
 def user_saved_posts():

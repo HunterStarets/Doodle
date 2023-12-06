@@ -9,7 +9,8 @@
 <!-- POST AND ADD A COMMENT -->
 <div class="container vote bg-light mb-4 pt-4 px-4">
     <!-- POST-->
-    <p class="mb-2"><strong class="pe-2">{{post.title}}</strong><span class="points">{{post.net_upvotes()}}</span>
+    <p class="mb-2"><strong class="pe-2">{{post.title}}</strong><span
+            class="points">{{app_repository_singleton.get_net_upvotes(post.post_id)}}</span>
         points</p>
     <p class="mb-2">Submitted {{ post.submitted_time }} hours ago<a href="#">{{ post.submitter }}</a></p>
     <div id="edit-post-container">
