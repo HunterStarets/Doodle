@@ -29,21 +29,13 @@ CREATE TABLE IF NOT EXISTS comment (
 );
 
 --A vote is a boolean and related to a post
-CREATE TABLE IF NOT EXISTS post_vote (
+CREATE TABLE IF NOT EXISTS vote (
     vote_id SERIAL PRIMARY KEY,
-    post_id INT NOT NULL REFERENCES post(post_id),
+    post_id INT post(post_id),
+    comment_id INT comment(comment_id),
     user_id INT NOT NULL REFERENCES app_user(user_id),
     is_upvote BOOLEAN NOT NULL,
     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE TABLE IF NOT EXISTS post_vote (
-    vote_id SERIAL PRIMARY KEY,
-    comment INT NOT NULL REFERENCES comment(comment_id),
-    user_id INT NOT NULL REFERENCES app_user(user_id),
-    is_upvote BOOLEAN NOT NULL,
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
 
 
