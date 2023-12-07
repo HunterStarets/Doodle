@@ -1,133 +1,173 @@
 {% extends '_template.html' %}
 
 {% block body %}
+<!-- Header -->
 <div>
-    <h1 class="text-center bg-secondary text-white p-5 mb-4">World News</h1>
+    <h1 class="text-center bg-secondary text-white p-5 mb-4">/{{ existing_post.community_name }}</h1>
 </div>
-
+<!-- Post container -->
 <div class="container vote bg-light mb-4 pt-4 px-4">
-    <p class="mb-2"><strong class="pe-2">Title</strong><span class="points">14</span> points</p>
-    <p class="mb-2">submitted 9 hours ago by <a href="#">john-smith</a></p>
+    <p class="mb-2">
+        <strong class="pe-2">{{ existing_post.title }}</strong><span class="points">0000</span> points
+    </p>
+    <p class="mb-2">Submitted 0000 hours ago by <a href="#">{{ author.username}}</a></p>
     <div id="edit-post-container">
-        <form>
-            <textarea id="post-textarea" class="form-control mb-2" style="min-height: 125px; background-color: white;" disabled>Lorem</textarea>
-            <label for="post-textarea" hidden></label>
-            <button type="button" class="cancel-button btn btn-primary mt-2 mb-3 me-2" hidden>Cancel</button>
-            <button type="submit" class="submit-button btn btn-primary mt-2 mb-3" hidden>Submit</button>
-        </form>
+        <textarea id="post-textarea" class="form-control" style="min-height: 125px; background-color: white;" disabled> {{ existing_post.content }}</textarea>
     </div>
     <div class="d-flex flex-row pt-1">
+        {% if session.get('user_id') %}
         <div class="px-2">
             <button class="btn btn-light bg-transparent upvote-button border-0 p-0">
                 <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
-            </button>  
+            </button>
             <button class="btn btn-light bg-transparent downvote-button border-0 p-0">
                 <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
             </button>
         </div>
+        {% endif %}
         <div class="d-flex flex-row pb-3">
-            <a class="px-2" id="edit-post-link" href="#">Edit</a>
+            {% if session.get('user_id') == author.user_id %}
+            <a class="px-2" id="edit-post-link" href="/posts/{{ existing_post.post_id }}/edit">Edit</a>
             <a class="px-2" id="delete-post-link" href="#">Delete</a>
+            <script>
+                const deletePostLink = document.getElementById("delete-post-link");
+        
+                deletePostLink.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    const confirmation = confirm("Are you sure want to delete this post?");
+        
+                    if (confirmation) {
+                        const form = document.createElement("form");
+                        form.action = "/posts/{{ existing_post.post_id }}/delete";
+                        form.method = "post";
+                        document.body.appendChild(form);
+                        form.submit();
+                    } else {
+                        // do nothing
+                    }
+                });
+            </script>
+            {% endif %}
+            {% if session.get('user_id') %}
             <a class="px-2" id="reply-post-link" href="#">Reply</a>
-            <a class="px-2" id="save-post-link" href="#">Save</a>
-        </div>                        
+            {% endif %}
+        </div>
     </div>
+    <!-- Reply to post container-->
     <div id="reply-post-container" hidden>
-        <form>
+        <form action="/comments" method="post">
             <div class="form-floating mb-3">
-                <textarea class="form-control" id="reply-post" placeholder="Leave a comment here" style="height: 100px" required></textarea>
-                <label for="reply-post">Comments</label>
-            </div>                    
+                <textarea class="form-control" id="comment-content" name="comment-content" placeholder="Leave a comment here" style="height: 100px"></textarea>
+                <label for="comment-content"></label>
+                <input type="hidden" name="post-id" value="{{ existing_post.post_id }}">
+            </div>
             <button type="button" class="cancel-button btn btn-primary mb-3 me-2">Cancel</button>
             <button type="submit" class="submit-button btn btn-primary mb-3">Submit</button>
         </form>
     </div>
 </div>
-
+<!-- Comments container -->
 <div class="container">
-    <h5>All comments</h5>
+    {% if existing_post.comments %}
+        <h5>All comments</h5>
+        {% for comment in existing_post.comments %}
+        <div class="container comment vote px-4 pt-2 mb-3 bg-light" >
+            <div class="d-flex flex-row">
+                <a href="#" class="pe-3 mb-2">{{ comment.author.username }}</a>
+                <p class="pe-3 mb-2"><span class="points">0000</span> points</p>
+                <p class="pe-3 mb-2">0000 hour ago</p>
+            </div>
+            <div class="edit-comment-container">
+                <p class="mb-2">{{ comment.content }}</p>
+                <form hidden>
+                    <textarea id="edit-comment" class="form-control mb-2" style="min-height: 125px; background-color: white;" required>Lorem</textarea>
+                    <label for="edit-comment"></label>
+                    <button type="button" class="cancel-button btn btn-primary mt-2 mb-3 me-2" >Cancel</button>
+                    <button type="submit" class="submit-button btn btn-primary mt-2 mb-3" >Submit</button>
+                </form>
+            </div>
+            <div class="d-flex flex-row pb-3">
+                {% if session.get('user_id') %}
+                <div class="px-2">
+                    <button class="btn btn-light bg-transparent upvote-button border-0 p-0">
+                        <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
+                    </button>  
+                    <button class="btn btn-light bg-transparent downvote-button border-0 p-0">
+                        <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                {% if session.get('user_id') == comment.author_id %}
+                <a class="edit-comment-link px-2" href="#">Edit</a>
+                <a class="delete-comment-link px-2" href="#">Delete</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <h5>No comments yet</h5>
+    {% endif %}
 </div>
 
 <script>
     const voteContainers = document.querySelectorAll(".vote");
 
     voteContainers.forEach(container => {
-    const upVoteButton = container.querySelector('.upvote-button');
-    const downVoteButton = container.querySelector('.downvote-button');
-    const points = container.querySelector('.points');
-    let hasUpVoted = false;
-    let hasDownVoted = false;
+        const upVoteButton = container.querySelector('.upvote-button');
+        const downVoteButton = container.querySelector('.downvote-button');
+        const points = container.querySelector('.points');
+        let hasUpVoted = false;
+        let hasDownVoted = false;
 
-    upVoteButton.addEventListener('click', function() {
-        if (hasDownVoted) {
-            points.textContent = parseInt(points.textContent) + 1;
-            downVoteButton.disabled = false;
-            upVoteButton.disabled = false;
-            hasUpVoted = false;
-            hasDownVoted = false;
-        } else if (!hasUpVoted) {
-            points.textContent = parseInt(points.textContent) + 1;
-            upVoteButton.disabled = true;
-            downVoteButton.disabled = false;                
-            hasUpVoted = true;
-            hasDownVoted = false;
-        }
-    });
+        upVoteButton.addEventListener('click', function () {
+            if (hasDownVoted) {
+                points.textContent = parseInt(points.textContent) + 1;
+                downVoteButton.disabled = false;
+                upVoteButton.disabled = false;
+                hasUpVoted = false;
+                hasDownVoted = false;
+            } else if (!hasUpVoted) {
+                points.textContent = parseInt(points.textContent) + 1;
+                upVoteButton.disabled = true;
+                downVoteButton.disabled = false;
+                hasUpVoted = true;
+                hasDownVoted = false;
+            }
+        });
 
-    downVoteButton.addEventListener('click', function() {
-        if (hasUpVoted) {
-            points.textContent = parseInt(points.textContent) - 1;
-            upVoteButton.disabled = false;
-            downVoteButton.disabled = false;
-            hasUpVoted = false;
-            hasDownVoted = false;
-        } else if (!hasDownVoted) {
-            points.textContent = parseInt(points.textContent) - 1;
-            downVoteButton.disabled = true;
-            upVoteButton.disabled = false;                
-            hasDownVoted = true;
-            hasUpVoted = false;
-        }
+        downVoteButton.addEventListener('click', function () {
+            if (hasUpVoted) {
+                points.textContent = parseInt(points.textContent) - 1;
+                upVoteButton.disabled = false;
+                downVoteButton.disabled = false;
+                hasUpVoted = false;
+                hasDownVoted = false;
+            } else if (!hasDownVoted) {
+                points.textContent = parseInt(points.textContent) - 1;
+                downVoteButton.disabled = true;
+                upVoteButton.disabled = false;
+                hasDownVoted = true;
+                hasUpVoted = false;
+            }
+        });
     });
-});
 </script>
-
 <script>
     const replyToPostLink = document.getElementById("reply-post-link");
 
-    replyToPostLink.addEventListener("click", function() {
+    replyToPostLink.addEventListener("click", function () {
         event.preventDefault();
         const replyToPostContainer = document.getElementById("reply-post-container")
         replyToPostContainer.removeAttribute('hidden');
 
         const cancelButton = replyToPostContainer.querySelector('.cancel-button');
-        cancelButton.addEventListener("click", function() {
+        cancelButton.addEventListener("click", function () {
             replyToPostContainer.setAttribute('hidden', true);
         });
-    }); 
-</script>
 
-<script>
-    const editPostLink = document.getElementById("edit-post-link");
-
-    editPostLink.addEventListener("click", function() {
-        event.preventDefault();
-        const editPostContainer = document.getElementById("edit-post-container");
-        const label = editPostContainer.querySelector('label');
-        const cancelButton = editPostContainer.querySelector('.cancel-button');
-        const submitButton = editPostContainer.querySelector('.submit-button');
-        const textarea = document.getElementById("post-textarea");
-        
-        textarea.removeAttribute('disabled');        
-        textarea.focus();
-        label.removeAttribute('hidden');
-        cancelButton.removeAttribute('hidden');
-        submitButton.removeAttribute('hidden');
-        
-        cancelButton.addEventListener("click", function() {
-            label.setAttribute('hidden', true);
-            cancelButton.setAttribute('hidden', true);
-            submitButton.setAttribute('hidden', true);
+        const submitButton = replyToPostContainer.querySelector('.submit-button');
+        submitButton.addEventListener("click", function () {
+            replyToPostContainer.setAttribute('hidden', true);
         });
     }); 
 </script>
