@@ -1,4 +1,4 @@
-from src.models import db, Post2
+from src.models import db, Post2, Comment
 
 class PostRepository:
 
@@ -17,8 +17,12 @@ class PostRepository:
         existing_post.community_name = community_name
         db.session.commit()
 
-    def delete_post(self, existing_post):
-        db.session.delete(existing_post)
+    def delete_post(self, post_to_delete):
+        comments_to_delete = Comment.query.filter_by(post_id=post_to_delete.post_id).all()
+        for comment in comments_to_delete:
+            db.session.delete(comment)
+            db.session.commit()       
+        db.session.delete(post_to_delete)
         db.session.commit()        
 
     def get_all_posts_by_author_id(self, existing_user):

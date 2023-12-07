@@ -1,5 +1,4 @@
-from src.models import User, Post2, db
-from src.repositories.post_repository import post_repository_singleton
+from src.models import User, db
 from sqlalchemy import func
 
 class UserRepository:
