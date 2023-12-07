@@ -1,4 +1,4 @@
-from src.models import User, db
+from src.models import User, db, Post2, Comment
 from sqlalchemy import func
 
 class UserRepository:
@@ -30,15 +30,26 @@ class UserRepository:
         existing_user.bio = bio
         db.session.commit()
 
-    def delete_user(self, existing_user) -> None:
-        # user_posts = post_repository_singleton.get_all_posts_by_author_id(existing_user.user_id)
-        # for post in user_posts:
-        #     post_repository_singleton.delete_post(post)
+    # (1) Delete users comments (2) delete comments associated with the users posts (3) delete users posts (4) delete user
+    def delete_user(self, user_to_delete) -> None:
+        user_comments = Comment.query.filter_by(author_id=user_to_delete.user_id).all()
+        for comment in user_comments: 
+            db.session.delete(comment)
+            db.session.commit()  
 
-        db.session.delete(existing_user)
+        user_posts = Post2.query.filter_by(author_id=user_to_delete.user_id).all()    
+
+        for post in user_posts:
+            other_user_comments = Comment.query.filter_by(post_id=post.post_id).all()
+            for comment in other_user_comments:
+                db.session.delete(comment)
+                db.session.commit()       
+            db.session.delete(post)
+            db.session.commit()   
+
+        db.session.delete(user_to_delete)
         db.session.commit()       
     
-    # Reference: module-15-assignment
     def search_users(self, username):
         found_user = User.query.filter(func.lower(User.username).like(func.lower(f'%{username}%'))).first()
         return found_user

@@ -28,7 +28,7 @@ db.init_app(app)
 app.secret_key = os.getenv('APP_SECRET_KEY', 'super-secure')
 bcrypt = Bcrypt(app)
 
-#Fix: needs to display all posts 
+#FIX: needs to display all posts 
 # Home page
 @app.route('/')
 def index():
@@ -194,7 +194,7 @@ def create_post_form():
         abort(401)
     return render_template('create_post_form.html')
 
-# Fix: needs to redirect to users profile
+# FIX: needs to redirect to users profile
 @app.post('/posts')
 def create_post():
     title = request.form.get('title')
@@ -212,7 +212,7 @@ def create_post():
     author_id = user.user_id
 
     post_repository_singleton.create_post(title, content, community_name, timestamp, author_id)
-    return redirect('/secret')
+    return redirect('/')
 
 # Edit post
 @app.get('/posts/<int:post_id>/edit')
@@ -258,10 +258,9 @@ def get_single_post(post_id:int):
     if not existing_post:
         abort(404)
     author = user_repository_singleton.get_user_by_id(existing_post.author_id)
-    comments = comment_repository_singleton.get_all_comments_by_post_id(existing_post.post_id)
     if not author:
         abort(404)
-    return render_template('get_single_post.html', existing_post=existing_post, author=author, comments=comments)
+    return render_template('get_single_post.html', existing_post=existing_post, author=author)
 
 # Create comment
 @app.post('/comments')
@@ -281,8 +280,3 @@ def create_comment():
     author_id = user.user_id
     comment_repository_singleton.create_comment(content, timestamp, post_id, author_id)
     return redirect(url_for('get_single_post', post_id=post_id))
-
-@app.get('/secret2')
-def get_secret_page2():
-
-    return render_template('comment.html')

@@ -53,7 +53,10 @@ class Comment(db.Model):
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     post_id = db.Column(db.Integer, db.ForeignKey('post.post_id'), nullable=False)
+    post = db.relationship('Post2', backref='comments', lazy=True)
     author_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
+    author = db.relationship('User', backref='comments', lazy=True)
+
 
     def __init__(self, content: str, timestamp: datetime, post_id: int, author_id: int) -> None:
         self.content = content

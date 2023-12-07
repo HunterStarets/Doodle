@@ -66,8 +66,47 @@
         </form>
     </div>
 </div>
+<!-- Comments container -->
 <div class="container">
-    <h5>All comments</h5>
+    {% if existing_post.comments %}
+        <h5>All comments</h5>
+        {% for comment in existing_post.comments %}
+        <div class="container comment vote px-4 pt-2 mb-3 bg-light" >
+            <div class="d-flex flex-row">
+                <a href="#" class="pe-3 mb-2">{{ comment.author.username }}</a>
+                <p class="pe-3 mb-2"><span class="points">0000</span> points</p>
+                <p class="pe-3 mb-2">0000 hour ago</p>
+            </div>
+            <div class="edit-comment-container">
+                <p class="mb-2">{{ comment.content }}</p>
+                <form hidden>
+                    <textarea id="edit-comment" class="form-control mb-2" style="min-height: 125px; background-color: white;" required>Lorem</textarea>
+                    <label for="edit-comment"></label>
+                    <button type="button" class="cancel-button btn btn-primary mt-2 mb-3 me-2" >Cancel</button>
+                    <button type="submit" class="submit-button btn btn-primary mt-2 mb-3" >Submit</button>
+                </form>
+            </div>
+            <div class="d-flex flex-row pb-3">
+                {% if session.get('user_id') %}
+                <div class="px-2">
+                    <button class="btn btn-light bg-transparent upvote-button border-0 p-0">
+                        <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
+                    </button>  
+                    <button class="btn btn-light bg-transparent downvote-button border-0 p-0">
+                        <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                {% if session.get('user_id') == comment.author_id %}
+                <a class="edit-comment-link px-2" href="#">Edit</a>
+                <a class="delete-comment-link px-2" href="#">Delete</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <h5>No comments yet</h5>
+    {% endif %}
 </div>
 
 <script>
