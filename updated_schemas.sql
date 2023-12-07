@@ -16,3 +16,11 @@ CREATE TABLE IF NOT EXISTS post (
     author_id INT NOT NULL REFERENCES app_user(user_id),
     community_name VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS comment (
+    comment_id SERIAL PRIMARY KEY,
+    content TEXT NOT NULL,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    post_id INT NOT NULL REFERENCES post(post_id),
+    author_id INT NOT NULL REFERENCES app_user(user_id)
+);
