@@ -5,6 +5,7 @@ from datetime import datetime
 from src.repositories.user_repository import user_repository_singleton
 from src.repositories.post_repository import post_repository_singleton
 from src.repositories.comment_repository import comment_repository_singleton
+from src.repositories.vote_repostory import vote_repository_singleton
 from src.models import db
 
 #TODO move comment and post objects into appropriate folder and update imports
@@ -36,7 +37,7 @@ def index():
     if 'user_id' in session:
         user = user_repository_singleton.get_user_by_id(session.get('user_id'))    
     posts = post_repository_singleton.get_all_posts()
-    return render_template('index.html', home_active=True, user=user, posts=posts, user_repository_singleton=user_repository_singleton)
+    return render_template('index.html', home_active=True, user=user, posts=posts, user_repository_singleton=user_repository_singleton, vote_repository_singleton= vote_repository_singleton)
 
 # User sign up
 @app.get('/signup')
@@ -177,6 +178,56 @@ def delete_user(user_id: int):
     del session['user_id']
     return redirect('/')
 
+#TODO: Expand so that anyone can input 
+#TODO: Maybe consolodate the nexy 4 routes into one, or at least consolodate upvoted and downvoted route
+@app.get('/users/<int:user_id>')
+def get_user(user_id: int):
+    user = None
+    if user_id:
+        user = user_repository_singleton.get_user_by_id(user_id)
+
+    if not user:
+        abort(401)
+
+    posts= post_repository_singleton.get_all_posts()
+    return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
+    
+@app.get('/users/<int:user_id>/comments')
+def get_user_comments(user_id: int):
+    user = None
+    if user_id:
+        user = user_repository_singleton.get_user_by_id(user_id)
+
+    if not user:
+        abort(401)
+
+    user_comments=comment_repository_singleton.get_comments_for_user(user.user_id)
+    return render_template('user_comments_only.html',view_profile_active=True,user=user,user_comments=user_comments, user_repository_singleton=user_repository_singleton, vote_repository_singleton=vote_repository_singleton)
+
+@app.get('/users/<int:user_id>/upvoted')
+def get_user_upvoted(user_id: int):
+        user = None
+        if user_id:
+            user = user_repository_singleton.get_user_by_id(user_id)
+
+        if not user:
+            abort(401)
+
+        posts= post_repository_singleton.get_all_posts()
+        return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
+
+@app.get('/users/<int:user_id>/downvoted')
+def get_user_downvoted(user_id: int):
+        user = None
+        if user_id:
+            user = user_repository_singleton.get_user_by_id(user_id)
+
+        if not user:
+            abort(401)
+
+        posts= post_repository_singleton.get_all_posts()
+        return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
+
 # Search users
 #Reference: module-15-assignment
 @app.get('/users/search')
@@ -254,13 +305,17 @@ def delete_post(post_id: int):
 # View single post
 @app.get('/posts/<int:post_id>')
 def get_single_post(post_id:int):
+    scroll_to_comments = request.args.get('scroll_to_comments', 'false').lower() == 'true'
+    reply_to_post = request.args.get('reply_to_post', 'false').lower() == 'true'
+    
     existing_post = post_repository_singleton.get_post_by_id(post_id)
     if not existing_post:
         abort(404)
     author = user_repository_singleton.get_user_by_id(existing_post.author_id)
     if not author:
         abort(404)
-    return render_template('get_single_post.html', existing_post=existing_post, author=author)
+
+    return render_template('get_single_post.html', vote_repository_singleton=vote_repository_singleton, existing_post=existing_post, author=author, scrollToComments=scroll_to_comments, replyToPost=reply_to_post)
 
 # Create comment
 @app.post('/comments')

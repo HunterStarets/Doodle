@@ -32,11 +32,6 @@ class PostRepository:
     def get_all_posts(self):
         return Post2.query.all()
     
-    # def get_all_posts(self):
-    #     return Post2.query.all()
-    
-    # def get_net_upvotes(self, post_id):
-    #     return 120
     
     
     # def create_post(self, author_id, title, content, community_name):
