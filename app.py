@@ -178,11 +178,16 @@ def delete_user(user_id: int):
     del session['user_id']
     return redirect('/')
 
+#TODO: Expand so that anyone can input 
+#TODO: Maybe consolodate the nexy 4 routes into one, or at least consolodate upvoted and downvoted route
 @app.get('/users/<int:user_id>')
 def get_user(user_id: int):
     user = None
-    if 'user_id' in session:
-        user = user_repository_singleton.get_user_by_id(session['user_id'])
+    if user_id:
+        user = user_repository_singleton.get_user_by_id(user_id)
+
+    if not user:
+        abort(401)
 
     posts= post_repository_singleton.get_all_posts()
     return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
@@ -190,11 +195,38 @@ def get_user(user_id: int):
 @app.get('/users/<int:user_id>/comments')
 def get_user_comments(user_id: int):
     user = None
-    if 'user_id' in session:
-        user = user_repository_singleton.get_user_by_id(session['user_id'])
+    if user_id:
+        user = user_repository_singleton.get_user_by_id(user_id)
+
+    if not user:
+        abort(401)
 
     user_comments=comment_repository_singleton.get_comments_for_user(user.user_id)
     return render_template('user_comments_only.html',view_profile_active=True,user=user,user_comments=user_comments, user_repository_singleton=user_repository_singleton, vote_repository_singleton=vote_repository_singleton)
+
+@app.get('/users/<int:user_id>/upvoted')
+def get_user_upvoted(user_id: int):
+        user = None
+        if user_id:
+            user = user_repository_singleton.get_user_by_id(user_id)
+
+        if not user:
+            abort(401)
+
+        posts= post_repository_singleton.get_all_posts()
+        return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
+
+@app.get('/users/<int:user_id>/downvoted')
+def get_user_downvoted(user_id: int):
+        user = None
+        if user_id:
+            user = user_repository_singleton.get_user_by_id(user_id)
+
+        if not user:
+            abort(401)
+
+        posts= post_repository_singleton.get_all_posts()
+        return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
 
 # Search users
 #Reference: module-15-assignment

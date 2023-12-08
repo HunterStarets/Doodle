@@ -7,18 +7,17 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <!--currently the upvoted/downvoted pages will just redirect to main user page as we haven't added that functionality yet-->
                 <li class="nav-item">
-                    <a class="nav-link" href="/users/{{ session['user_id'] }}">Posts</a>
+                    <a class="nav-link" href="/users/{{ user.user_id }}">Posts</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/users/{{ session['user_id'] }}/comments">Comments</a>
+                    <a class="nav-link" href="/users/{{ user.user_id }}/comments">Comments</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="view_profile">Upvoted</a>
+                    <a class="nav-link" href="/users/{{ user.user_id }}/upvoted">Upvoted</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="view_profile">Downvoted</a>
+                    <a class="nav-link" href="/users/{{ user.user_id }}/downvoted">Downvoted</a>
                 </li>
             </ul>
         </div>
