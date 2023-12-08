@@ -1,9 +1,14 @@
 <div class="container px-4 bg-light d-flex flex-row align-items-center card vote">
     <div class="d-flex flex-column px-2">
-        <button class="btn btn-light border-0 p-0 bg-transparent upvote-button" style="font-size: 50px;">
+        <!--If the user is not logged in, then the buttons are still visable, but not interactable-->
+        <button
+            class="btn btn-light border-0 p-0 bg-transparent {% if session.get('user_id') %} upvote-button {% endif %}"
+            style="font-size: 50px;">
             <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
         </button>
-        <button class="btn btn-light border-0 p-0 bg-transparent downvote-button" style="font-size: 50px;">
+        <button
+            class="btn btn-light border-0 p-0 bg-transparent {% if session.get('user_id') %} downvote-button {% endif %}"
+            style="font-size: 50px;">
             <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
         </button>
     </div>

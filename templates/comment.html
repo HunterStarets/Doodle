@@ -24,8 +24,8 @@
             <button class="btn btn-light bg-transparent downvote-button border-0 p-0">
                 <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
             </button>
-            {% endif %}
         </div>
+        {% endif %}
         {% if session.get('user_id') == comment.author_id %}
         <a class="edit-comment-link px-2" href="#">Edit</a>
         <a class="delete-comment-link px-2" href="#">Delete</a>
