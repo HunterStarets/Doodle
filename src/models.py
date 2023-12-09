@@ -67,27 +67,37 @@ class Comment(db.Model):
     def __repr__(self) -> str:
             return f'Comment({self.comment_id}, {self.content}, {self.timestamp}, {self.post_id}, {self.author_id})'
 
-# class Comment(db.Model):
-#     __tablename__ = 'comment'
+# Vote Model
+class PostVote(db.Model):
+    __tablename__ = 'post_vote'
     
-#     comment_id = db.Column(db.Integer, primary_key=True)
-#     post_id = db.Column(db.Integer, db.ForeignKey('post.post_id'), nullable=False)
-#     author_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
-#     content = db.Column(db.Text, nullable=False)
-#     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    
-#     def __repr__(self):
-#         return f'<Comment {self.comment_id}>'
+    vote_id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.post_id'), nullable=False)
+    voter_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
+    is_upvote = db.Column(db.Boolean, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-# # Vote Model
-# class Vote(db.Model):
-#     __tablename__ = 'vote'
-    
-#     vote_id = db.Column(db.Integer, primary_key=True)
-#     post_id = db.Column(db.Integer, db.ForeignKey('post.post_id'), nullable=False)
-#     user_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
-#     is_upvote = db.Column(db.Boolean, nullable=False)
-#     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    def __init__(self, post_id, voter_id, is_upvote):
+        self.post_id = post_id
+        self.voter_id = voter_id
+        self.is_upvote = is_upvote
 
-#     def __repr__(self):
-#         return f'<Vote {self.vote_id}: {"Upvote" if self.is_upvote else "Downvote"}>'
+    def __repr__(self):
+        return f"<PostVote(vote_id={self.vote_id}, post_id={self.post_id}, voter_id={self.voter_id}, is_upvote={self.is_upvote}, timestamp={self.timestamp})>"
+
+class CommentVote(db.Model):
+    __tablename__ = 'comment_vote'
+
+    vote_id = db.Column(db.Integer, primary_key=True)
+    comment_id = db.Column(db.Integer, db.ForeignKey('comment.comment_id'), nullable=False)
+    voter_id = db.Column(db.Integer, db.ForeignKey('app_user.user_id'), nullable=False)
+    is_upvote = db.Column(db.Boolean, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __init__(self, comment_id, voter_id, is_upvote):
+        self.comment_id = comment_id
+        self.voter_id = voter_id
+        self.is_upvote = is_upvote
+
+    def __repr__(self):
+        return f"<CommentVote(vote_id={self.vote_id}, comment_id={self.comment_id}, voter_id={self.voter_id}, is_upvote={self.is_upvote}, timestamp={self.timestamp})>"
