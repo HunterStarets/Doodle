@@ -3,7 +3,7 @@ console.log("vote has run");
 
 voteContainers.forEach(container => {
     const postId = container.getAttribute('data-post-id');
-    const voterId = container.getAttribute('voter-id');
+    const commentId = container.getAttribute('data-comment-id');
     const points = container.querySelector('.points');
 
     const upVoteButton = container.querySelector('.upvote-button');
@@ -11,29 +11,71 @@ voteContainers.forEach(container => {
     
     
     upVoteButton.addEventListener('click', async function () {
-        const result = await handleVote(postId, 'up');
-        //console.log(result);
-        updateButtonState(result, upVoteButton, downVoteButton, points);
+        let result;
+        if(postId)
+            result = await handlePostVote(postId, 'up');
+        else{
+            result = await handleCommentVote(commentId, 'up');
+        }
+
+        if(result){
+            updateButtonState(result, upVoteButton, downVoteButton, points);
+        }
     });
 
     downVoteButton.addEventListener('click', async function () {
-        const result = await handleVote(postId, 'down');
-        //console.log(result);
-        updateButtonState(result, upVoteButton, downVoteButton, points);
+        let result;
+        if(postId)
+            result = await handlePostVote(postId, 'down');
+        else{
+            result = await handleCommentVote(commentId, 'down');
+        }
+
+        if(result){
+            updateButtonState(result, upVoteButton, downVoteButton, points);
+        }
     });
 });
 
 
-async function handleVote(postId, voteType) {
+async function handlePostVote(postId, voteType) {
     try {
-        const response = await fetch('/vote', {
+        const response = await fetch('/vote/post', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                // Add other headers if required
             },
             body: JSON.stringify({
                 post_id: postId,
+                vote_type: voteType
+            })
+        });
+
+        const data = await response.json();
+        //console.log(data)
+        if (response.status === 201) { //vote created
+            return { voted: voteType, status: response.status, netVotes: data.netVotes };
+        } else if (response.status === 200) { //vote deleted
+            return { voted: null, status: response.status, netVotes: data.netVotes  };
+        } else {
+            // errors
+            return { error: data.error, status: response.status, netVotes: data.netVotes  };
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        return { error: 'An error occurred', status: 500 };
+    }
+}
+
+async function handleCommentVote(commentId, voteType) {
+    try {
+        const response = await fetch('/vote/comment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                comment_id: commentId,
                 vote_type: voteType
             })
         });
@@ -63,7 +105,6 @@ function updateButtonState(result, upVoteButton, downVoteButton, points) {
         upVoteButton.disabled = isUpvoted;
         downVoteButton.disabled = isDownvoted;
 
-        // Optionally, you can add/remove classes to visually indicate the state
         upVoteButton.classList.toggle('active', isUpvoted);
         downVoteButton.classList.toggle('active', isDownvoted);
     } else {

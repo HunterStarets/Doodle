@@ -1,4 +1,6 @@
 {% extends '_template.html' %}
+{% set vote = vote_repository_singleton.get_post_vote_by_post_and_user_ids(existing_post.post_id,
+session.get('user_id')) %}
 
 {% block body %}
 <!-- Header -->
@@ -7,8 +9,8 @@
 </div>
 
 <!-- Post container -->
-<div class="container vote bg-light mb-4 pt-4 px-4">
-    <p class="mb-2">
+<div class="container vote bg-light mb-4 pt-4 px-4" data-post-id="{{ existing_post.post_id }}">
+    <p class=" mb-2">
         <strong class="pe-2">{{ existing_post.title }}</strong><span class="points">{{
             vote_repository_singleton.get_net_post_votes(existing_post.post_id) }}</span> votes
     </p>
@@ -21,10 +23,12 @@
     <div class="d-flex flex-row pt-1">
         {% if session.get('user_id') %}
         <div class="px-2">
-            <button class="btn btn-light bg-transparent upvote-button border-0 p-0">
+            <button class="btn btn-light bg-transparent upvote-button border-0 p-0" {% if vote and vote.is_upvote %}
+                disabled {% endif %}>
                 <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
             </button>
-            <button class="btn btn-light bg-transparent downvote-button border-0 p-0">
+            <button class="btn btn-light bg-transparent downvote-button border-0 p-0" {% if vote and not vote.is_upvote
+                %} disabled {% endif %}>
                 <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
             </button>
         </div>

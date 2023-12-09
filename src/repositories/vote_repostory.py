@@ -18,8 +18,18 @@ class VoteRepository:
         vote = PostVote.query.filter_by(post_id=post_id, voter_id=voter_id).first()
         return vote
     
+    def get_comment_vote_by_comment_and_user_ids(self, comment_id, voter_id):
+        vote = CommentVote.query.filter_by(comment_id=comment_id, voter_id=voter_id).first()
+        return vote
+    
     def delete_post_vote_by_id(self, vote_id):
         vote = PostVote.query.filter_by(vote_id=vote_id).first()
+        db.session.delete(vote)
+        db.session.commit()
+        return vote.vote_id
+    
+    def delete_comment_vote_by_id(self, vote_id):
+        vote = CommentVote.query.filter_by(vote_id=vote_id).first()
         db.session.delete(vote)
         db.session.commit()
         return vote.vote_id
@@ -27,6 +37,7 @@ class VoteRepository:
     def get_all_post_votes(self):
         votes = PostVote.query.all()
         return votes
+    
     def get_net_post_votes(self, post_id):
         votes = PostVote.query.filter(PostVote.post_id == post_id).all()
         

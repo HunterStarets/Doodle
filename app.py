@@ -337,8 +337,8 @@ def create_comment():
     return redirect(url_for('get_single_post', post_id=post_id))
 
 
-@app.post('/vote')
-def handle_vote():
+@app.post('/vote/post')
+def handle_post_vote():
     data = request.json
     voter_id = session.get('user_id')
 
@@ -368,4 +368,38 @@ def handle_vote():
     #User does not have a vote on this post, so creating a new one
     new_vote = vote_repository_singleton.create_post_vote(post_id, voter_id, vote_type == 'up')
     net_votes = vote_repository_singleton.get_net_post_votes(post_id)
+    return jsonify({'message': 'Vote created', 'voteType': 'up' if vote_type == 'up' else 'down', 'netVotes': net_votes}), 201
+
+
+@app.post('/vote/comment')
+def handle_comment_vote():
+    data = request.json
+    voter_id = session.get('user_id')
+
+    if 'comment_id' in data and 'vote_type' in data:
+        comment_id = data['comment_id']
+        vote_type = data['vote_type']
+    else:
+        return jsonify({'error': 'Invalid request'}), 400
+    
+    if not voter_id:
+        return jsonify({'error': 'User not logged in'}), 401
+    
+    #TODO: Add way to verify there is only one vote per user for a post
+    # if there are multiple THIS WILL NOT WORK
+    # right now, it just queries the first from the database, future iterations should add some sort of rule to the database to
+    # verify that only vote can be added to a post per user
+    existing_vote = vote_repository_singleton.get_comment_vote_by_comment_and_user_ids(comment_id, voter_id)
+    if existing_vote:
+        if (existing_vote.is_upvote and vote_type == 'down') or (not existing_vote.is_upvote and vote_type == 'up'):
+            vote_repository_singleton.delete_comment_vote_by_id(existing_vote.vote_id)
+            net_votes = vote_repository_singleton.get_net_comment_votes(comment_id)
+            #Vote not created, user already has a vote of the opposite type on this post, deleting this vote
+            return jsonify({'message': 'Vote deleted', 'voteType': None, 'netVotes': net_votes}), 200
+        #Vote not created, user already has a vote of this type on this post
+        net_votes = vote_repository_singleton.get_net_comment_votes(comment_id)
+        return jsonify({'error': 'Vote not changed', 'voteType': 'up' if existing_vote.is_upvote else 'down', 'netVotes': net_votes}), 409
+    #User does not have a vote on this post, so creating a new one
+    new_vote = vote_repository_singleton.create_comment_vote(comment_id, voter_id, vote_type == 'up')
+    net_votes = vote_repository_singleton.get_net_comment_votes(comment_id)
     return jsonify({'message': 'Vote created', 'voteType': 'up' if vote_type == 'up' else 'down', 'netVotes': net_votes}), 201
