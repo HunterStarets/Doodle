@@ -1,5 +1,9 @@
-<div class="container comment vote px-4 pt-2 mb-3 bg-light">
-    <div class="d-flex flex-row">
+{% set vote = vote_repository_singleton.get_comment_vote_by_comment_and_user_ids(comment.post_id,
+session.get('user_id'))
+%}
+
+<div class="container comment vote px-4 pt-2 mb-3 bg-light" data-comment-id="{{ comment.comment_id }}">
+    <div class=" d-flex flex-row">
         <a href="#" class="pe-3 mb-2">{{ comment.author.username }}</a>
         <p class="pe-3 mb-2"><span class="points">{{
                 vote_repository_singleton.get_net_comment_votes(comment.comment_id) }}</span> points</p>
@@ -18,10 +22,12 @@
     <div class="d-flex flex-row pb-3">
         {% if session.get('user_id') %}
         <div class="px-2">
-            <button class="btn btn-light bg-transparent upvote-button border-0 p-0">
+            <button class="btn btn-light bg-transparent upvote-button border-0 p-0" {% if vote and vote.is_upvote %}
+                disabled {% endif %}>
                 <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
             </button>
-            <button class="btn btn-light bg-transparent downvote-button border-0 p-0">
+            <button class="btn btn-light bg-transparent downvote-button border-0 p-0" {% if vote and not vote.is_upvote
+                %} disabled {% endif %}>
                 <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
             </button>
         </div>
@@ -32,5 +38,3 @@
         {% endif %}
     </div>
 </div>
-
-<script src="/static/js/vote.js"></script>

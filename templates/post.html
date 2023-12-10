@@ -1,14 +1,16 @@
-<div class="container px-4 bg-light d-flex flex-row align-items-center card vote">
-    <div class="d-flex flex-column px-2">
+{% set vote = vote_repository_singleton.get_post_vote_by_post_and_user_ids(post.post_id, session.get('user_id')) %}
+
+<div class="container px-4 bg-light d-flex flex-row align-items-center card vote" data-post-id="{{ post.post_id }}">
+    <div class=" d-flex flex-column px-2">
         <!--If the user is not logged in, then the buttons are still visable, but not interactable-->
         <button
             class="btn btn-light border-0 p-0 bg-transparent {% if session.get('user_id') %} upvote-button {% endif %}"
-            style="font-size: 50px;">
+            style="font-size: 50px;" {% if vote and vote.is_upvote %} disabled {% endif %}>
             <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
         </button>
         <button
             class="btn btn-light border-0 p-0 bg-transparent {% if session.get('user_id') %} downvote-button {% endif %}"
-            style="font-size: 50px;">
+            style="font-size: 50px;" {% if vote and not vote.is_upvote %} disabled {% endif %}>
             <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
         </button>
     </div>
@@ -29,5 +31,3 @@
         </div>
     </div>
 </div>
-
-<script src="/static/js/vote.js"></script>
