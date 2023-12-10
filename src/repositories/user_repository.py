@@ -42,7 +42,7 @@ class UserRepository:
 
         user_comments = Comment.query.filter_by(author_id=user_to_delete.user_id).all()
         for comment in user_comments: 
-            votes = CommentVote.query.filter_by(comment_id=comment.comment_id)
+            votes = CommentVote.query.filter_by(comment_id=comment.comment_id).all()
             for vote in votes:
                 db.session.delete(vote)
                 db.session.commit()
@@ -54,18 +54,28 @@ class UserRepository:
         for post in user_posts:
             other_user_comments = Comment.query.filter_by(post_id=post.post_id).all()
             for comment in other_user_comments:
-                votes = CommentVote.query.filter_by(comment_id=comment.comment_id)
+                votes = CommentVote.query.filter_by(comment_id=comment.comment_id).all()
                 for vote in votes:
                     db.session.delete(vote)
                     db.session.commit()
                 db.session.delete(comment)
                 db.session.commit()
-            votes = PostVote.query.filter_by(post_id=post.post_id)
+            votes = PostVote.query.filter_by(post_id=post.post_id).all()
             for vote in votes:
                 db.session.delete(vote)
                 db.session.commit()     
             db.session.delete(post)
-            db.session.commit()   
+            db.session.commit()  
+
+        #still having issues deleting user, so just clearing the database of all of the votes associated with them
+        user_comment_votes = CommentVote.query.filter_by(voter_id=user_to_delete.user_id).all()
+        for vote in user_comment_votes:
+            db.session.delete(vote)
+            db.session.commit()
+        user_post_votes = PostVote.query.filter_by(voter_id=user_to_delete.user_id).all()
+        for vote in user_post_votes:
+            db.session.delete(vote)
+            db.session.commit()
 
         db.session.delete(user_to_delete)
         db.session.commit()       
