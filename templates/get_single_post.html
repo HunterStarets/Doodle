@@ -15,7 +15,7 @@ session.get('user_id')) %}
             vote_repository_singleton.get_net_post_votes(existing_post.post_id) }}</span> votes
     </p>
     <!-- TODO: update the formatting of the timestamps-->
-    <p class="mb-2">Submitted {{ existing_post.timestamp }} hours ago by <a href="#">{{ author.username }}</a></p>
+    <p class="mb-2">Submitted {{ existing_post.timestamp }} hours ago by <a href="/users/{{ author.user_id }}">{{ author.username }}</a></p>
     <div id="edit-post-container">
         <textarea id="post-textarea" class="form-control" style="min-height: 125px; background-color: white;"
             disabled> {{ existing_post.content }}</textarea>

@@ -19,8 +19,8 @@
         <p class="mb-2"><strong class="pe-2"><a href="/posts/{{ post.post_id }}">{{ post.title
                     }}</a></strong> <span class="points">{{
                 vote_repository_singleton.get_net_post_votes(post.post_id) }}</span> points </p>
-        <p class="mb-2">Submitted {{ post.timestamp }} by {{
-            user_repository_singleton.get_user_by_id(post.author_id).username }} to {{
+        <p class="mb-2">Submitted {{ post.timestamp }} by <a href="/users/{{ post.author_id }}">{{
+                user_repository_singleton.get_user_by_id(post.author_id).username }}</a> to {{
             post.community_name }}</p>
 
         <div class="d-flex flex-row mt-auto">

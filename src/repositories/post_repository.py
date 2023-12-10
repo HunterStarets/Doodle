@@ -5,15 +5,16 @@ class PostRepository:
     def get_post_by_id(self, post_id):
         post = Post2.query.filter_by(post_id=post_id).first()
         return post
-    
+      
     def get_posts_by_ids(self, post_ids):
         posts = Post2.query.filter(Post2.post_id.in_(post_ids)).all()
         return posts
     
-    def create_post(self, title, content, community_name, timestamp, author_id) -> None:
+    def create_post(self, title, content, community_name, timestamp, author_id):
         new_post = Post2(title, content, community_name, timestamp, author_id)
         db.session.add(new_post)
         db.session.commit()
+        return new_post
 
     def edit_post(self, existing_post, title, content, community_name) -> None:
         existing_post.title = title
