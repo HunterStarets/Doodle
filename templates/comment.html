@@ -1,4 +1,4 @@
-{% set vote = vote_repository_singleton.get_comment_vote_by_comment_and_user_ids(comment.post_id,
+{% set vote = vote_repository_singleton.get_comment_vote_by_comment_and_user_ids(comment.comment_id,
 session.get('user_id'))
 %}
 
