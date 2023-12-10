@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, abort, redirect, session, url_for, jsonify
+from flask import Flask, render_template, request, abort, redirect, session, url_for, jsonify, flash
 from flask_bcrypt import Bcrypt
 from datetime import datetime
 
@@ -57,16 +57,20 @@ def signup():
     last_name = request.form.get('last-name')
     bio = request.form.get('bio')
 
+    # Check for missing fields
     if not (email and username and raw_password and first_name and last_name and bio): 
-        abort(400)
+        flash('Please fill in all fields.', 'error')
+        return render_template('signup.html')
 
     existing_email = user_repository_singleton.get_user_by_email(email)
     if existing_email:
-        abort(400)
+        flash('Email already in use. Please choose another one.', 'error')
+        return render_template('signup.html')
 
     existing_username = user_repository_singleton.get_user_by_username(username)
     if existing_username:
-        abort(400)
+        flash('Username is taken. Please choose another one.', 'error')
+        return render_template('signup.html')
 
     hashed_password = bcrypt.generate_password_hash(raw_password, 12).decode()
 
