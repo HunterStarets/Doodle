@@ -189,7 +189,7 @@ def get_user(user_id: int):
     if not user:
         abort(401)
 
-    posts= post_repository_singleton.get_all_posts()
+    posts= post_repository_singleton.get_all_posts_by_author_id(user_id)
     return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
     
 @app.get('/users/<int:user_id>/comments')
@@ -213,7 +213,13 @@ def get_user_upvoted(user_id: int):
         if not user:
             abort(401)
 
-        posts= post_repository_singleton.get_all_posts()
+        post_ids = set()
+        upvotes = vote_repository_singleton.get_post_upvotes_by_user_id(user_id)
+        for upvote in upvotes:
+            post_ids.add(upvote.post_id)
+
+        posts = post_repository_singleton.get_posts_by_ids(post_ids)
+
         return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
 
 @app.get('/users/<int:user_id>/downvoted')
@@ -225,7 +231,13 @@ def get_user_downvoted(user_id: int):
         if not user:
             abort(401)
 
-        posts= post_repository_singleton.get_all_posts()
+        post_ids = set()
+        downvotes = vote_repository_singleton.get_post_downvotes_by_user_id(user_id)
+        for downvote in downvotes:
+            post_ids.add(downvote.post_id)
+
+        posts = post_repository_singleton.get_posts_by_ids(post_ids)
+
         return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
 
 # Search users
@@ -334,8 +346,51 @@ def create_comment():
         abort(401)
 
     author_id = user.user_id
-    comment_repository_singleton.create_comment(content, timestamp, post_id, author_id)
-    return redirect(url_for('get_single_post', post_id=post_id))
+    new_comment = comment_repository_singleton.create_comment(content, timestamp, post_id, author_id)
+    return redirect("/posts/"+ str(new_comment.post_id) + '#' + str(new_comment.comment_id))
+
+# Delete comment
+@app.post('/comments/<int:comment_id>/delete')
+def delete_comment(comment_id: int):
+    comment_to_delete = comment_repository_singleton.get_comment_by_id(comment_id)
+    print(comment_to_delete)
+    if not comment_to_delete:
+        abort(404)
+    
+    comment_repository_singleton.delete_comment(comment_to_delete)
+ 
+     #redirect to the referring page
+    referrer = request.headers.get("Referer")
+    if referrer:
+        return redirect(referrer)
+    else:
+        return redirect('/')  #fallback to home if no referrer is found
+    
+# Edit comment
+@app.get('/comments/<int:comment_id>/edit')
+def edit_comment_form(comment_id: int):
+    if 'user_id' not in session and 'username' not in session:
+        abort(401)
+    existing_comment = comment_repository_singleton.get_comment_by_id(comment_id)
+    if not existing_comment:
+        abort(404)
+    if existing_comment.author_id != session.get('user_id'):
+        abort(403)
+    return render_template('edit_comment_form.html', existing_comment=existing_comment)
+
+@app.post('/comments/<int:comment_id>')
+def edit_comment(comment_id: int):
+    content = request.form.get('content')
+    if not content:
+        abort(400)
+
+    existing_comment = comment_repository_singleton.get_comment_by_id(comment_id)
+    if not existing_comment:
+        abort(401)
+
+    comment_repository_singleton.edit_comment(existing_comment, content)
+    
+    return redirect("/posts/"+ str(existing_comment.post_id) + '#' + str(comment_id))
 
 
 @app.post('/vote/post')

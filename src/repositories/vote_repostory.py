@@ -2,16 +2,22 @@ from src.models import db, PostVote, CommentVote
 
 class VoteRepository:
 
+    def get_post_votes_by_post_id(self, post_id):
+        return PostVote.query.filter_by(post_id=post_id).all()
+    
+    def get_comment_votes_by_comment_id(self, comment_id):
+        return PostVote.query.filter_by(comment_id=comment_id).all()
+    
     def get_post_vote_by_id(self, vote_id):
         vote = PostVote.query.filter_by(vote_id=vote_id).first()
         return vote
     
     def get_post_upvotes_by_user_id(self, user_id):
-        votes = PostVote.query.filter_by(user_id=user_id, is_upvote = True)
+        votes = PostVote.query.filter_by(voter_id=user_id, is_upvote = True)
         return votes
     
     def get_post_downvotes_by_user_id(self, user_id):
-        votes = PostVote.query.filter_by(user_id=user_id, is_upvote = False)
+        votes = PostVote.query.filter_by(voter_id=user_id, is_upvote = False)
         return votes
     
     def get_post_vote_by_post_and_user_ids(self, post_id, voter_id):
@@ -21,6 +27,12 @@ class VoteRepository:
     def get_comment_vote_by_comment_and_user_ids(self, comment_id, voter_id):
         vote = CommentVote.query.filter_by(comment_id=comment_id, voter_id=voter_id).first()
         return vote
+    
+    def get_all_post_votes_by_user_id(self, user_id):
+        return PostVote.query.filter_by(user_id=user_id).all()
+    
+    def get_all_comment_votes_by_user_id(self, user_id):
+        return CommentVote.query.filter_by(user_id=user_id).all()
     
     def delete_post_vote_by_id(self, vote_id):
         vote = PostVote.query.filter_by(vote_id=vote_id).first()
