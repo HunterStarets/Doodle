@@ -8,7 +8,8 @@ from src.repositories.comment_repository import comment_repository_singleton
 from src.repositories.vote_repostory import vote_repository_singleton
 from src.models import db
 
-#TODO move comment and post objects into appropriate folder and update imports
+#TODO make sure there are no references to these anymore
+# i want to delete them now but im scared it will break something that I wont notice 
 from post import Post
 from comment import Comment
 

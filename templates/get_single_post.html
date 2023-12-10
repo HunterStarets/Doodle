@@ -14,8 +14,10 @@ session.get('user_id')) %}
         <strong class="pe-2">{{ existing_post.title }}</strong><span class="points">{{
             vote_repository_singleton.get_net_post_votes(existing_post.post_id) }}</span> votes
     </p>
-    <!-- TODO: update the formatting of the timestamps-->
-    <p class="mb-2">Submitted {{ existing_post.timestamp }} hours ago by <a href="/users/{{ author.user_id }}">{{ author.username }}</a></p>
+
+    <p class="mb-2">Submitted <span id="timestamp{{ existing_post.post_id }}"></span> by <a
+            href="/users/{{ author.user_id }}">{{
+            author.username }}</a></p>
     <div id="edit-post-container">
         <textarea id="post-textarea" class="form-control" style="min-height: 125px; background-color: white;"
             disabled> {{ existing_post.content }}</textarea>
@@ -90,6 +92,11 @@ session.get('user_id')) %}
 
 <!--Updates the Arrow visuals on the screen-->
 <script src="/static/js/vote.js"></script>
+
+<script>
+    var postTimestamp = "{{ existing_post.timestamp }}";
+    document.getElementById('timestamp{{ existing_post.post_id }}').textContent = formatTimestamp(postTimestamp);
+</script>
 
 <!--Shows the reply to post section when the anchor is clicked-->
 <script>

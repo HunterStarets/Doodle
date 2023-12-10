@@ -5,10 +5,10 @@ session.get('user_id'))
 <div class="container comment vote px-4 pt-2 mb-3 bg-light" data-comment-id="{{ comment.comment_id }}"
     id="{{ comment.comment_id }}">
     <div class=" d-flex flex-row">
-        <a href="/users/{{ author.user_id }}" class="pe-3 mb-2">{{ comment.author.username }}</a>
+        <a href="/users/{{ comment.author.user_id }}" class="pe-3 mb-2">{{ comment.author.username }}</a>
         <p class="pe-3 mb-2"><span class="points">{{
                 vote_repository_singleton.get_net_comment_votes(comment.comment_id) }}</span> points</p>
-        <p class="pe-3 mb-2">{{ comment.timestamp }} hour ago</p>
+        <p class="pe-3 mb-2"><span id="timestamp{{ comment.comment_id }}"></span></p>
     </div>
     <div class="edit-comment-container">
         <p class="mb-2">{{ comment.content }}</p>
@@ -57,3 +57,8 @@ session.get('user_id'))
         {% endif %}
     </div>
 </div>
+
+<script>
+    var commentTimestamp = "{{ comment.timestamp }}";
+    document.getElementById('timestamp{{comment.comment_id}}').textContent = formatTimestamp(commentTimestamp);
+</script>

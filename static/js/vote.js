@@ -1,5 +1,4 @@
 const voteContainers = document.querySelectorAll(".vote");
-console.log("vote has run");
 
 voteContainers.forEach(container => {
     const postId = container.getAttribute('data-post-id');
