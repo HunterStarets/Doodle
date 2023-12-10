@@ -189,7 +189,7 @@ def get_user(user_id: int):
     if not user:
         abort(401)
 
-    posts= post_repository_singleton.get_all_posts()
+    posts= post_repository_singleton.get_all_posts_by_author_id(user_id)
     return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
     
 @app.get('/users/<int:user_id>/comments')
@@ -213,7 +213,13 @@ def get_user_upvoted(user_id: int):
         if not user:
             abort(401)
 
-        posts= post_repository_singleton.get_all_posts()
+        post_ids = set()
+        upvotes = vote_repository_singleton.get_post_upvotes_by_user_id(user_id)
+        for upvote in upvotes:
+            post_ids.add(upvote.post_id)
+
+        posts = post_repository_singleton.get_posts_by_ids(post_ids)
+
         return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
 
 @app.get('/users/<int:user_id>/downvoted')
@@ -225,7 +231,13 @@ def get_user_downvoted(user_id: int):
         if not user:
             abort(401)
 
-        posts= post_repository_singleton.get_all_posts()
+        post_ids = set()
+        downvotes = vote_repository_singleton.get_post_downvotes_by_user_id(user_id)
+        for downvote in downvotes:
+            post_ids.add(downvote.post_id)
+
+        posts = post_repository_singleton.get_posts_by_ids(post_ids)
+
         return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
 
 # Search users

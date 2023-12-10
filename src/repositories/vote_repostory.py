@@ -7,11 +7,11 @@ class VoteRepository:
         return vote
     
     def get_post_upvotes_by_user_id(self, user_id):
-        votes = PostVote.query.filter_by(user_id=user_id, is_upvote = True)
+        votes = PostVote.query.filter_by(voter_id=user_id, is_upvote = True)
         return votes
     
     def get_post_downvotes_by_user_id(self, user_id):
-        votes = PostVote.query.filter_by(user_id=user_id, is_upvote = False)
+        votes = PostVote.query.filter_by(voter_id=user_id, is_upvote = False)
         return votes
     
     def get_post_vote_by_post_and_user_ids(self, post_id, voter_id):
