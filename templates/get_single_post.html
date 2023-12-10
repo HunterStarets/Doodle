@@ -14,7 +14,6 @@ session.get('user_id')) %}
         <strong class="pe-2">{{ existing_post.title }}</strong><span class="points">{{
             vote_repository_singleton.get_net_post_votes(existing_post.post_id) }}</span> votes
     </p>
-
     <p class="mb-2">Submitted <span id="timestamp{{ existing_post.post_id }}"></span> by <a
             href="/users/{{ author.user_id }}">{{
             author.username }}</a></p>

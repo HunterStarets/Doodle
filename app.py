@@ -38,6 +38,7 @@ def index():
     if 'user_id' in session:
         user = user_repository_singleton.get_user_by_id(session.get('user_id'))    
     posts = post_repository_singleton.get_all_posts()
+    posts = sort_posts_newest_to_oldest(posts)
     return render_template('index.html', home_active=True, user=user, posts=posts, user_repository_singleton=user_repository_singleton, vote_repository_singleton= vote_repository_singleton)
 
 # User sign up
@@ -191,6 +192,7 @@ def get_user(user_id: int):
         abort(401)
 
     posts= post_repository_singleton.get_all_posts_by_author_id(user_id)
+    posts = sort_posts_newest_to_oldest(posts)
     return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
     
 @app.get('/users/<int:user_id>/comments')
@@ -203,6 +205,7 @@ def get_user_comments(user_id: int):
         abort(401)
 
     user_comments=comment_repository_singleton.get_comments_for_user(user.user_id)
+    user_comments = sort_posts_newest_to_oldest(user_comments)
     return render_template('user_comments_only.html',view_profile_active=True,user=user,user_comments=user_comments, user_repository_singleton=user_repository_singleton, vote_repository_singleton=vote_repository_singleton)
 
 @app.get('/users/<int:user_id>/upvoted')
@@ -220,6 +223,7 @@ def get_user_upvoted(user_id: int):
             post_ids.add(upvote.post_id)
 
         posts = post_repository_singleton.get_posts_by_ids(post_ids)
+        posts = sort_posts_newest_to_oldest(posts)
 
         return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
 
@@ -238,6 +242,8 @@ def get_user_downvoted(user_id: int):
             post_ids.add(downvote.post_id)
 
         posts = post_repository_singleton.get_posts_by_ids(post_ids)
+        posts = sort_posts_newest_to_oldest(posts)
+
 
         return render_template('view_profile.html', view_profile_active=True, user=user, posts=posts, vote_repository_singleton=vote_repository_singleton, user_repository_singleton=user_repository_singleton)
 
@@ -329,6 +335,7 @@ def get_single_post(post_id:int):
     if not author:
         abort(404)
 
+    existing_post.comments = sort_posts_newest_to_oldest(existing_post.comments)
     return render_template('get_single_post.html', vote_repository_singleton=vote_repository_singleton, existing_post=existing_post, author=author, scrollToComments=scroll_to_comments, replyToPost=reply_to_post)
 
 # Create comment
@@ -460,3 +467,8 @@ def handle_comment_vote():
     new_vote = vote_repository_singleton.create_comment_vote(comment_id, voter_id, vote_type == 'up')
     net_votes = vote_repository_singleton.get_net_comment_votes(comment_id)
     return jsonify({'message': 'Vote created', 'voteType': 'up' if vote_type == 'up' else 'down', 'netVotes': net_votes}), 201
+
+def sort_posts_newest_to_oldest(posts):
+    # Sort the posts list by the timestamp attribute in descending order
+    sorted_posts = sorted(posts, key=lambda post: post.timestamp, reverse=True)
+    return sorted_posts

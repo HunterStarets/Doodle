@@ -43,12 +43,14 @@ class PostRepository:
         return posts
     
     def get_all_posts_by_post_votes(self, post_votes):
-        posts = Post2.query.filter
+        return None
 
 
     def get_all_posts(self):
         return Post2.query.all()
     
+    def get_all_posts_newest_first(self):
+        return Post2.query.order_by(Post2.timestamp.desc()).all()
     
     
     # def create_post(self, author_id, title, content, community_name):
