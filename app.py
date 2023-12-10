@@ -336,6 +336,23 @@ def create_comment():
     comment_repository_singleton.create_comment(content, timestamp, post_id, author_id)
     return redirect(url_for('get_single_post', post_id=post_id))
 
+# Delete comment
+@app.post('/comments/<int:comment_id>/delete')
+def delete_comment(comment_id: int):
+    comment_to_delete = comment_repository_singleton.get_comment_by_id(comment_id)
+    print(comment_to_delete)
+    if not comment_to_delete:
+        abort(404)
+    
+    comment_repository_singleton.delete_comment(comment_to_delete)
+ 
+     #redirect to the referring page
+    referrer = request.headers.get("Referer")
+    if referrer:
+        return redirect(referrer)
+    else:
+        return redirect('/')  #fallback to home if no referrer is found
+
 
 @app.post('/vote/post')
 def handle_post_vote():

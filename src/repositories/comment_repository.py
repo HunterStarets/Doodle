@@ -18,5 +18,10 @@ class CommentRepository:
         comments = Comment.query.filter(Comment.author_id == user_id).all()
         return comments
     
+    def delete_comment(self, comment):
+        comment_to_delete = Comment.query.get(comment.comment_id)
+        db.session.delete(comment_to_delete)
+        db.session.commit()
+    
 # Singleton to be used in other modules
 comment_repository_singleton = CommentRepository()

@@ -34,7 +34,25 @@ session.get('user_id'))
         {% endif %}
         {% if session.get('user_id') == comment.author_id %}
         <a class="edit-comment-link px-2" href="#">Edit</a>
-        <a class="delete-comment-link px-2" href="#">Delete</a>
+        <a class="delete-comment-link px-2" id="delete-comment-link" href="#">Delete</a>
+        <script>
+            const deleteCommentLink = document.getElementById("delete-comment-link");
+
+            deleteCommentLink.addEventListener("click", function (e) {
+                e.preventDefault();
+                const confirmation = confirm("Are you sure want to delete this comment?");
+
+                if (confirmation) {
+                    const form = document.createElement("form");
+                    form.action = "/comments/{{ comment.comment_id }}/delete";
+                    form.method = "post";
+                    document.body.appendChild(form);
+                    form.submit();
+                } else {
+                    // do nothing
+                }
+            });
+        </script>
         {% endif %}
     </div>
 </div>
