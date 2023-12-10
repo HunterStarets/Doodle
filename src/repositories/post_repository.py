@@ -6,10 +6,11 @@ class PostRepository:
         post = Post2.query.filter_by(post_id=post_id).first()
         return post
     
-    def create_post(self, title, content, community_name, timestamp, author_id) -> None:
+    def create_post(self, title, content, community_name, timestamp, author_id):
         new_post = Post2(title, content, community_name, timestamp, author_id)
         db.session.add(new_post)
         db.session.commit()
+        return new_post
 
     def edit_post(self, existing_post, title, content, community_name) -> None:
         existing_post.title = title

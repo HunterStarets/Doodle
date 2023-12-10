@@ -262,8 +262,9 @@ def create_post():
         abort(401)
     author_id = user.user_id
 
-    post_repository_singleton.create_post(title, content, community_name, timestamp, author_id)
-    return redirect('/')
+    new_post = post_repository_singleton.create_post(title, content, community_name, timestamp, author_id)
+    new_post_id = new_post.post_id
+    return redirect(f'/posts/{new_post_id}')
 
 # Edit post
 @app.get('/posts/<int:post_id>/edit')
