@@ -1,0 +1,18 @@
+{% extends '_template.html' %}
+
+{% block body %}
+<div class="container">
+    <h1 class="mt-3">Edit Comment</h1>
+    <form action="/comments/{{ existing_comment.comment_id }}" method="post">
+        <div class="mb-3">
+            <label for="content" class="form-label">Content</label>
+            <div class="form-floating">
+                <textarea id="content" name="content" class="form-control" style="height: 100px"
+                    required>{{ existing_comment.content }}</textarea>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+{% endblock %}

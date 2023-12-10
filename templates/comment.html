@@ -2,7 +2,8 @@
 session.get('user_id'))
 %}
 
-<div class="container comment vote px-4 pt-2 mb-3 bg-light" data-comment-id="{{ comment.comment_id }}">
+<div class="container comment vote px-4 pt-2 mb-3 bg-light" data-comment-id="{{ comment.comment_id }}"
+    id="{{ comment.comment_id }}">
     <div class=" d-flex flex-row">
         <a href="#" class="pe-3 mb-2">{{ comment.author.username }}</a>
         <p class="pe-3 mb-2"><span class="points">{{
@@ -33,8 +34,26 @@ session.get('user_id'))
         </div>
         {% endif %}
         {% if session.get('user_id') == comment.author_id %}
-        <a class="edit-comment-link px-2" href="#">Edit</a>
-        <a class="delete-comment-link px-2" href="#">Delete</a>
+        <a class="edit-comment-link px-2" href="/comments/{{ comment.comment_id }}/edit">Edit</a>
+        <a class="delete-comment-link px-2" id="delete-comment-link" href="#">Delete</a>
+        <script>
+            const deleteCommentLink = document.getElementById("delete-comment-link");
+
+            deleteCommentLink.addEventListener("click", function (e) {
+                e.preventDefault();
+                const confirmation = confirm("Are you sure want to delete this comment?");
+
+                if (confirmation) {
+                    const form = document.createElement("form");
+                    form.action = "/comments/{{ comment.comment_id }}/delete";
+                    form.method = "post";
+                    document.body.appendChild(form);
+                    form.submit();
+                } else {
+                    // do nothing
+                }
+            });
+        </script>
         {% endif %}
     </div>
 </div>
