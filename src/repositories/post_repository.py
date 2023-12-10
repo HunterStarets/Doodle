@@ -1,4 +1,4 @@
-from src.models import db, Post2, Comment
+from src.models import db, Post2, Comment, CommentVote, PostVote
 
 class PostRepository:
 
@@ -24,8 +24,16 @@ class PostRepository:
     def delete_post(self, post_to_delete):
         comments_to_delete = Comment.query.filter_by(post_id=post_to_delete.post_id).all()
         for comment in comments_to_delete:
+            votes = CommentVote.query.filter_by(comment_id=comment.comment_id)
+            for vote in votes:
+                db.session.delete(vote)
+                db.session.commit()
             db.session.delete(comment)
-            db.session.commit()       
+            db.session.commit()  
+        votes = PostVote.query.filter_by(post_id=post_to_delete.post_id)
+        for vote in votes:
+            db.session.delete(vote)
+            db.session.commit()        
         db.session.delete(post_to_delete)
         db.session.commit()        
 
