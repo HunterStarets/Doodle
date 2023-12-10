@@ -1,4 +1,4 @@
-from src.models import User, db, Post2, Comment
+from src.models import User, db, Post2, Comment, PostVote, CommentVote
 from sqlalchemy import func
 
 class UserRepository:
@@ -30,10 +30,22 @@ class UserRepository:
         existing_user.bio = bio
         db.session.commit()
 
+    # OLD FLOW
     # (1) Delete users comments (2) delete comments associated with the users posts (3) delete users posts (4) delete user
+    
+    # UPDATED FLOW
+    #(1) Delete all votes associated with users comments (2) delete users comments (3) delete all votes associated with comments
+    # associated with users posts (4) delete comments associated with users posts (5) delete votes associate with users posts (6) delete users posts (7) delete user
     def delete_user(self, user_to_delete) -> None:
+        
+        #TODO: move db.session.commit() to once at the end of the loops
+
         user_comments = Comment.query.filter_by(author_id=user_to_delete.user_id).all()
         for comment in user_comments: 
+            votes = CommentVote.query.filter_by(comment_id=comment.comment_id)
+            for vote in votes:
+                db.session.delete(vote)
+                db.session.commit()
             db.session.delete(comment)
             db.session.commit()  
 
@@ -42,8 +54,16 @@ class UserRepository:
         for post in user_posts:
             other_user_comments = Comment.query.filter_by(post_id=post.post_id).all()
             for comment in other_user_comments:
+                votes = CommentVote.query.filter_by(comment_id=comment.comment_id)
+                for vote in votes:
+                    db.session.delete(vote)
+                    db.session.commit()
                 db.session.delete(comment)
-                db.session.commit()       
+                db.session.commit()
+            votes = PostVote.query.filter_by(post_id=post.post_id)
+            for vote in votes:
+                db.session.delete(vote)
+                db.session.commit()     
             db.session.delete(post)
             db.session.commit()   
 
