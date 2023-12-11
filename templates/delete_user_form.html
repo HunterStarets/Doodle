@@ -6,23 +6,35 @@
     <div>
         <h4 class="mt-4">We're sorry to see you go</h4>
         <p>Deleting your account will permanently remove your profile and username. Please note that this action
-        will also result in the deletion of your posts and comments. If you have any questions or concerns, feel free to contact us.
-        Thank you for being a part of our community.
+            will also result in the deletion of your posts and comments. If you have any questions or concerns, feel
+            free to contact us.
+            Thank you for being a part of our community.
         </p>
     </div>
     <h4>Verify your identity</h4>
+    {% with messages = get_flashed_messages(category_filter=["error"]) %}
+    {% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+        {{ message }}<br>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
     <form action="/users/{{ existing_user.user_id }}/delete" method="post">
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" name="username" value="{{ existing_user.username }}">
+            <input type="text" class="form-control" id="username" name="username" value="{{ existing_user.username }}"
+                required>
         </div>
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password">
+            <input type="password" class="form-control" id="password" name="password" required>
         </div>
         <div class="mb-3 form-check">
-            <label class="form-check-label" for="checkbox">I understand that deleted accounts are not recoverable</label>
-            <input type="checkbox" class="form-check-input" id="checkbox" name="checkbox">
+            <label class="form-check-label" for="checkbox">I understand that deleted accounts are not
+                recoverable</label>
+            <input type="checkbox" class="form-check-input" id="checkbox" name="checkbox" required>
         </div>
         <button type="submit" class="btn btn-primary">Delete account</button>
     </form>

@@ -1,0 +1,21 @@
+{% extends '_template.html' %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="text-center">
+                <h1 class="display-1 font-weight-bold">Error {{ status_code }}</h1>
+                <p class="fs-3"> <span class="text-muted">{{ message }}</span> </p>
+                <hr>
+                <p class="lead">
+                    It seems something went wrong. We are working on it.
+                </p>
+                <a href="/" class="btn btn-primary btn-lg mt-3">
+                    Take me home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

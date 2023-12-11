@@ -60,17 +60,17 @@ def signup():
     # Check for missing fields
     if not (email and username and raw_password and first_name and last_name and bio): 
         flash('Please fill in all fields.', 'error')
-        return render_template('signup.html')
+        return redirect('/signup')
 
     existing_email = user_repository_singleton.get_user_by_email(email)
     if existing_email:
         flash('Email already in use. Please choose another one.', 'error')
-        return render_template('signup.html')
+        return redirect('/signup')
 
     existing_username = user_repository_singleton.get_user_by_username(username)
     if existing_username:
         flash('Username is taken. Please choose another one.', 'error')
-        return render_template('signup.html')
+        return redirect('/signup')
 
     hashed_password = bcrypt.generate_password_hash(raw_password, 12).decode()
 
@@ -84,15 +84,21 @@ def signup():
 def login():
     username = request.form.get('username')
     raw_password = request.form.get('password')
-    if not (username and raw_password):   
-        abort(400)
-
+    # Check if both fields are provided
+    if not (username and raw_password):
+        flash('Please enter both username and password.', 'error')
+        return redirect('/')
     existing_user = user_repository_singleton.get_user_by_username(username)
-    if not existing_user: 
-        abort(401)
+    # Check if the user exists
+    if not existing_user:
+        flash('Incorrect username or password.', 'error')
+        return redirect('/')
 
+    # Check if the password is correct
     if not bcrypt.check_password_hash(existing_user.password, raw_password):
-        abort(401)
+        flash('Incorrect username or password.', 'error')
+        return redirect('/')
+
 
     session['user_id'] = existing_user.user_id
     session['username'] = username
@@ -108,13 +114,19 @@ def logout():
 # Edit user
 @app.get('/users/<int:user_id>/edit')
 def edit_user_form(user_id: int):
-    if 'user_id' not in session and 'username' not in session:
-        abort(401)
+    if 'user_id' not in session or 'username' not in session:
+        message = 'You must be logged in to edit user details.'
+        return render_template('error.html', message=message, status_code=401), 401
+
     if session.get('user_id') != user_id:
-        abort(403)
+        message = 'You do not have permission to edit this user.'
+        return render_template('error.html', message=message, status_code=403), 403
+
     existing_user = user_repository_singleton.get_user_by_id(user_id)
     if not existing_user:
-        abort(404)
+        message = 'User not found.'
+        return render_template('error.html', message=message, status_code=404), 404
+    
     return render_template('edit_user_form.html', existing_user=existing_user)
 
 @app.post('/users/<int:user_id>')
@@ -127,25 +139,35 @@ def edit_user(user_id: int):
     last_name = request.form.get('last-name')
     bio = request.form.get('bio')
 
+    #check if all fields are provided
     if not(email and username and current_password and new_password and first_name and last_name and bio): 
-        abort(400)
+        flash('All fields are required.', 'error')
+        return redirect('/users/' + str(user_id) + '/edit')
 
     existing_user = user_repository_singleton.get_user_by_id(user_id)
+    #check if the user exists
     if not existing_user:
-        abort(401)
+        flash('User not found.', 'error')
+        return redirect('/users/' + str(user_id) + '/edit')
 
+    #check if email is taken by another user
     if email != existing_user.email: 
         existing_email = user_repository_singleton.get_user_by_email(email)
         if existing_email:
-            abort(400)
+            flash('Email is already in use.', 'error')
+            return redirect('/users/' + str(user_id) + '/edit')
 
+    #check if username is taken by another user
     if username != existing_user.username:
         existing_username = user_repository_singleton.get_user_by_username(username)
         if existing_username:
-            abort(400)
+            flash('Username is already taken.', 'error')
+            return redirect('/users/' + str(user_id) + '/edit')
 
+    #check if the current password is correct
     if not bcrypt.check_password_hash(existing_user.password, current_password):
-        abort(401)
+        flash('Current password is incorrect.', 'error')
+        return redirect('/users/' + str(user_id) + '/edit')
     hashed_password = bcrypt.generate_password_hash(new_password, 12).decode()
 
     user_repository_singleton.edit_user(existing_user, email, username, hashed_password, first_name, last_name, bio)
@@ -169,15 +191,18 @@ def delete_user(user_id: int):
     password = request.form.get('password')
     checkbox = request.form.get('checkbox')
 
-    if not(username and password and checkbox):
-        abort(400)
-    
+    if not (username and password and checkbox):
+        flash('Please provide all the required fields.', 'error')
+        return redirect('/users/' + str(user_id) + '/delete')
+
     existing_user = user_repository_singleton.get_user_by_id(user_id)
-    if not existing_user: 
-        abort(401)
+    if not existing_user:
+        flash('No user found with the provided ID.', 'error')
+        return redirect('/users/' + str(user_id) + '/delete')
 
     if not bcrypt.check_password_hash(existing_user.password, password):
-        abort(401)
+        flash('Password is incorrect.', 'error')
+        return redirect('/users/' + str(user_id) + '/delete')
 
     user_repository_singleton.delete_user(existing_user)
     del session['username']
@@ -193,7 +218,7 @@ def get_user(user_id: int):
         user = user_repository_singleton.get_user_by_id(user_id)
 
     if not user:
-        abort(401)
+        return render_template('error.html', message='User not found', status_code=404), 404
 
     posts= post_repository_singleton.get_all_posts_by_author_id(user_id)
     posts = sort_posts_newest_to_oldest(posts)
@@ -206,7 +231,7 @@ def get_user_comments(user_id: int):
         user = user_repository_singleton.get_user_by_id(user_id)
 
     if not user:
-        abort(401)
+        return render_template('error.html', message='User not found', status_code=404), 404
 
     user_comments=comment_repository_singleton.get_comments_for_user(user.user_id)
     user_comments = sort_posts_newest_to_oldest(user_comments)
@@ -219,7 +244,7 @@ def get_user_upvoted(user_id: int):
             user = user_repository_singleton.get_user_by_id(user_id)
 
         if not user:
-            abort(401)
+            return render_template('error.html', message='User not found', status_code=404), 404
 
         post_ids = set()
         upvotes = vote_repository_singleton.get_post_upvotes_by_user_id(user_id)
@@ -238,7 +263,7 @@ def get_user_downvoted(user_id: int):
             user = user_repository_singleton.get_user_by_id(user_id)
 
         if not user:
-            abort(401)
+            return render_template('error.html', message='User not found', status_code=404), 404
 
         post_ids = set()
         downvotes = vote_repository_singleton.get_post_downvotes_by_user_id(user_id)
@@ -471,6 +496,14 @@ def handle_comment_vote():
     new_vote = vote_repository_singleton.create_comment_vote(comment_id, voter_id, vote_type == 'up')
     net_votes = vote_repository_singleton.get_net_comment_votes(comment_id)
     return jsonify({'message': 'Vote created', 'voteType': 'up' if vote_type == 'up' else 'down', 'netVotes': net_votes}), 201
+
+@app.errorhandler(Exception)
+def handle_error(e):
+    status_code = getattr(e, 'code', 500)
+    message = str(e) 
+    return render_template('error.html', message=message, status_code=status_code), status_code
+
+
 
 def sort_posts_newest_to_oldest(posts):
     # Sort the posts list by the timestamp attribute in descending order
