@@ -27,6 +27,28 @@
         <div class="d-flex flex-row mt-auto">
             <p class="px-2"><a href="/posts/{{ post.post_id }}?scroll_to_comments=true">{{ post.comments|length }}
                     comments</a></p>
+                    {% if session.get('user_id') == post.author_id %}
+                    <a class="px-2" id="edit-post-link" href="/posts/{{ post.post_id }}/edit">Edit</a>
+                    <a class="px-2" id="delete-post-link" href="#">Delete</a>
+                    <script>
+                        const deletePostLink = document.getElementById("delete-post-link");
+        
+                        deletePostLink.addEventListener("click", function (e) {
+                            e.preventDefault();
+                            const confirmation = confirm("Are you sure want to delete this post?");
+        
+                            if (confirmation) {
+                                const form = document.createElement("form");
+                                form.action = "/posts/{{ post.post_id }}/delete";
+                                form.method = "post";
+                                document.body.appendChild(form);
+                                form.submit();
+                            } else {
+                                // do nothing
+                            }
+                        });
+                    </script>
+                    {% endif %}
             <p class="px-2"><a id="replyToPostLink" href="/posts/{{ post.post_id }}?reply_to_post=true">Reply</a></p>
 
         </div>
