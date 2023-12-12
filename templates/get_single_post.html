@@ -12,7 +12,7 @@ session.get('user_id')) %}
 <div class="container vote bg-light mb-4 pt-4 px-4" data-post-id="{{ existing_post.post_id }}">
     <p class=" mb-2">
         <strong class="pe-2">{{ existing_post.title }}</strong><span class="points">{{
-            vote_repository_singleton.get_net_post_votes(existing_post.post_id) }}</span> votes
+            vote_repository_singleton.get_net_post_votes(existing_post.post_id) }}</span> points
     </p>
     <p class="mb-2">Submitted <span id="timestamp{{ existing_post.post_id }}"></span> by <a
             href="/users/{{ author.user_id }}">{{
