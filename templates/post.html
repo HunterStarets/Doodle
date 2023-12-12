@@ -49,8 +49,9 @@
                         });
                     </script>
                     {% endif %}
+                    {% if session.get('user_id') %}
             <p class="px-2"><a id="replyToPostLink" href="/posts/{{ post.post_id }}?reply_to_post=true">Reply</a></p>
-
+                    {% endif %}
         </div>
     </div>
 </div>
