@@ -7,20 +7,22 @@
                     }}</a></strong> <span class="points">{{
                 vote_repository_singleton.get_net_post_votes(post.post_id) }}</span> points </p>
         <p class="mb-2">Submitted <span id="timestamp{{ post.post_id }}"></span> by 
-        <a href="/users/{{ post.author_id }}">{{ user_repository_singleton.get_user_by_id(post.author_id).username }}</a> to {{ post.community_name }}</p>
+        <a href="/users/{{ post.author_id }}">{{ user_repository_singleton.get_user_by_id(post.author_id).username }}</a> to /{{ post.community_name }}</p>
 
         <div class="d-flex flex-row pb-2">
+            {% if session.get('user_id') %}
             <div class="px-2">
                 <!--If the user is not logged in, then the buttons are still visable, but not interactable-->
-                <button class="btn btn-light border-0 p-0 bg-transparent {% if session.get('user_id') %} upvote-button {% endif %}" 
+                <button class="btn btn-light border-0 p-0 bg-transparent upvote-button" 
                 {% if vote and vote.is_upvote %} disabled {% endif %}>
                     <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
                 </button>
-                <button class="btn btn-light border-0 p-0 bg-transparent {% if session.get('user_id') %} downvote-button {% endif %}"
+                <button class="btn btn-light border-0 p-0 bg-transparent downvote-button"
                 {% if vote and not vote.is_upvote %} disabled {% endif %}>
                     <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
                 </button>
             </div>
+            {% endif %}
             <p class="px-2"><a href="/posts/{{ post.post_id }}?scroll_to_comments=true">{{ post.comments|length }} comments</a></p>
             {% if session.get('user_id') == post.author_id %}
             <a class="px-2" id="edit-post-link" href="/posts/{{ post.post_id }}/edit">Edit</a>

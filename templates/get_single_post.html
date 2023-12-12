@@ -24,12 +24,12 @@ session.get('user_id')) %}
     <div class="d-flex flex-row pt-1">
         {% if session.get('user_id') %}
         <div class="px-2">
-            <button class="btn btn-light bg-transparent upvote-button border-0 p-0" {% if vote and vote.is_upvote %}
-                disabled {% endif %}>
+            <button class="btn btn-light bg-transparent upvote-button border-0 p-0" 
+            {% if vote and vote.is_upvote %} disabled {% endif %}>
                 <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
             </button>
-            <button class="btn btn-light bg-transparent downvote-button border-0 p-0" {% if vote and not vote.is_upvote
-                %} disabled {% endif %}>
+            <button class="btn btn-light bg-transparent downvote-button border-0 p-0" 
+            {% if vote and not vote.is_upvote %} disabled {% endif %}>
                 <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
             </button>
         </div>
