@@ -1,57 +1,52 @@
 {% set vote = vote_repository_singleton.get_post_vote_by_post_and_user_ids(post.post_id, session.get('user_id')) %}
 
-<div class="container px-4 bg-light d-flex flex-row align-items-center card vote" data-post-id="{{ post.post_id }}">
-    <div class=" d-flex flex-column px-2">
-        <!--If the user is not logged in, then the buttons are still visable, but not interactable-->
-        <button
-            class="btn btn-light border-0 p-0 bg-transparent {% if session.get('user_id') %} upvote-button {% endif %}"
-            style="font-size: 50px;" {% if vote and vote.is_upvote %} disabled {% endif %}>
-            <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
-        </button>
-        <button
-            class="btn btn-light border-0 p-0 bg-transparent {% if session.get('user_id') %} downvote-button {% endif %}"
-            style="font-size: 50px;" {% if vote and not vote.is_upvote %} disabled {% endif %}>
-            <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
-        </button>
-    </div>
+<div class="container comment vote px-4 pt-2 mb-3 bg-light" data-post-id="{{ post.post_id }}">
 
-    <div class="d-flex flex-column" style="margin-left: 20px;">
+    <div class="d-flex flex-column">
         <p class="mb-2"><strong class="pe-2"><a href="/posts/{{ post.post_id }}">{{ post.title
                     }}</a></strong> <span class="points">{{
                 vote_repository_singleton.get_net_post_votes(post.post_id) }}</span> points </p>
-        <p class="mb-2">Submitted <span id="timestamp{{ post.post_id }}"></span> by <a
-                href="/users/{{ post.author_id }}">{{
-                user_repository_singleton.get_user_by_id(post.author_id).username }}</a> to {{
-            post.community_name }}</p>
+        <p class="mb-2">Submitted <span id="timestamp{{ post.post_id }}"></span> by 
+        <a href="/users/{{ post.author_id }}">{{ user_repository_singleton.get_user_by_id(post.author_id).username }}</a> to {{ post.community_name }}</p>
 
-        <div class="d-flex flex-row mt-auto">
-            <p class="px-2"><a href="/posts/{{ post.post_id }}?scroll_to_comments=true">{{ post.comments|length }}
-                    comments</a></p>
-                    {% if session.get('user_id') == post.author_id %}
-                    <a class="px-2" id="edit-post-link" href="/posts/{{ post.post_id }}/edit">Edit</a>
-                    <a class="px-2" id="delete-post-link" href="#">Delete</a>
-                    <script>
-                        const deletePostLink = document.getElementById("delete-post-link");
-        
-                        deletePostLink.addEventListener("click", function (e) {
-                            e.preventDefault();
-                            const confirmation = confirm("Are you sure want to delete this post?");
-        
-                            if (confirmation) {
-                                const form = document.createElement("form");
-                                form.action = "/posts/{{ post.post_id }}/delete";
-                                form.method = "post";
-                                document.body.appendChild(form);
-                                form.submit();
-                            } else {
-                                // do nothing
-                            }
-                        });
-                    </script>
-                    {% endif %}
-                    {% if session.get('user_id') %}
+        <div class="d-flex flex-row pb-2">
+            <div class="px-2">
+                <!--If the user is not logged in, then the buttons are still visable, but not interactable-->
+                <button class="btn btn-light border-0 p-0 bg-transparent {% if session.get('user_id') %} upvote-button {% endif %}" 
+                {% if vote and vote.is_upvote %} disabled {% endif %}>
+                    <i class="fa-solid fa-arrow-up-long" style="color: #000000;"></i>
+                </button>
+                <button class="btn btn-light border-0 p-0 bg-transparent {% if session.get('user_id') %} downvote-button {% endif %}"
+                {% if vote and not vote.is_upvote %} disabled {% endif %}>
+                    <i class="fa-solid fa-arrow-down-long" style="color: #000000;"></i>
+                </button>
+            </div>
+            <p class="px-2"><a href="/posts/{{ post.post_id }}?scroll_to_comments=true">{{ post.comments|length }} comments</a></p>
+            {% if session.get('user_id') == post.author_id %}
+            <a class="px-2" id="edit-post-link" href="/posts/{{ post.post_id }}/edit">Edit</a>
+            <a class="px-2" id="delete-post-link" href="#">Delete</a>
+            <script>
+                const deletePostLink = document.getElementById("delete-post-link");
+
+                deletePostLink.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const confirmation = confirm("Are you sure want to delete this post?");
+
+                    if (confirmation) {
+                        const form = document.createElement("form");
+                        form.action = "/posts/{{ post.post_id }}/delete";
+                        form.method = "post";
+                        document.body.appendChild(form);
+                        form.submit();
+                    } else {
+                        // do nothing
+                    }
+                });
+            </script>
+            {% endif %}
+            {% if session.get('user_id') %}
             <p class="px-2"><a id="replyToPostLink" href="/posts/{{ post.post_id }}?reply_to_post=true">Reply</a></p>
-                    {% endif %}
+            {% endif %}
         </div>
     </div>
 </div>
@@ -59,4 +54,4 @@
 <script>
     var postTimestamp = "{{ post.timestamp }}";
     document.getElementById('timestamp{{post.post_id}}').textContent = formatTimestamp(postTimestamp);
-  </script>
+</script>

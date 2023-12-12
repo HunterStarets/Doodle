@@ -12,13 +12,6 @@ session.get('user_id'))
     </div>
     <div class="edit-comment-container">
         <p class="mb-2">{{ comment.content }}</p>
-        <form hidden>
-            <textarea id="edit-comment" class="form-control mb-2" style="min-height: 125px; background-color: white;"
-                required>Lorem</textarea>
-            <label for="edit-comment"></label>
-            <button type="button" class="cancel-button btn btn-primary mt-2 mb-3 me-2">Cancel</button>
-            <button type="submit" class="submit-button btn btn-primary mt-2 mb-3">Submit</button>
-        </form>
     </div>
     <div class="d-flex flex-row pb-3">
         {% if session.get('user_id') %}
