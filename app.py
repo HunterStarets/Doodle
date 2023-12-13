@@ -25,7 +25,6 @@ db.init_app(app)
 app.secret_key = os.getenv('APP_SECRET_KEY', 'super-secure')
 bcrypt = Bcrypt(app)
 
-#FIX: needs to display all posts 
 # Home page
 @app.route('/')
 def index():
@@ -246,11 +245,14 @@ def get_user_downvoted(user_id: int):
 #Reference: module-15-assignment
 @app.get('/users/search')
 def search_users():
+    user = None
+    if 'user_id' in session:
+        user = user_repository_singleton.get_user_by_id(session.get('user_id'))    
     found_user = None
     q = request.args.get('q', '')
     if q != '':
         found_user = user_repository_singleton.search_users(q)
-    return render_template('search_users.html', user=found_user)
+    return render_template('search_users.html', user=user, found_user=found_user)
 
 # Create posts
 @app.get('/posts/new')
