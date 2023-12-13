@@ -15,12 +15,15 @@ load_dotenv()
 
 app = Flask(__name__)
 
+
 # DB connection
 if os.getenv("ENV") == 'testing':
-   app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{os.getenv("DB_USER")}:{os.getenv("DB_PASS")}@{os.getenv("DB_HOST")}:{os.getenv("DB_PORT")}/test_db'
+   app.config['SQLALCHEMY_DATABASE_URI'] = \
+    f'postgresql://{os.getenv("DB_TEST_USER")}:{os.getenv("DB_TEST_PASS")}@{os.getenv("DB_TEST_HOST")}:{os.getenv("DB_TEST_PORT")}/{os.getenv("DB_TEST_NAME")}'
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = \
-        f'postgresql://{os.getenv("DB_USER")}:{os.getenv("DB_PASS")}@{os.getenv("DB_HOST")}:{os.getenv("DB_PORT")}/{os.getenv("DB_NAME")}'
+    f'postgresql://{os.getenv("DB_USER")}:{os.getenv("DB_PASS")}@{os.getenv("DB_HOST")}:{os.getenv("DB_PORT")}/{os.getenv("DB_NAME")}'
+    
 app.config['SQLALCHEMY_ECHO'] = True
 db.init_app(app)
 

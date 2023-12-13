@@ -1,6 +1,9 @@
 from src.models import User, Post2, Comment, PostVote, CommentVote, db
 
-def insert_db():
-        new_user = User("drako789@gmail.com", "drako789", "abc", "drako", "joya", "bio")
-        db.session.add(new_user)
+def clear_db():
+        CommentVote.query.delete()
+        PostVote.query.delete()
+        Comment.query.delete()
+        Post2.query.delete()
+        User.query.delete()
         db.session.commit()
