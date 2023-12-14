@@ -11,7 +11,8 @@ def test_home_page(test_app: FlaskClient):
         response_data = response.data.decode('utf-8')
 
     assert '<div class="col-md-9">' in response_data
-
+    assert response.status_code == 200
+    
 def test_post_lists(test_app: FlaskClient):
     with app.app_context():
         clear_db()
