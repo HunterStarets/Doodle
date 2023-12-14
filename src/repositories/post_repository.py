@@ -5,7 +5,7 @@ class PostRepository:
     def get_post_by_id(self, post_id):
         post = Post2.query.filter_by(post_id=post_id).first()
         return post
-      
+    
     def get_posts_by_ids(self, post_ids):
         posts = Post2.query.filter(Post2.post_id.in_(post_ids)).all()
         return posts
