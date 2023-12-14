@@ -8,11 +8,6 @@ from src.repositories.comment_repository import comment_repository_singleton
 from src.repositories.vote_repostory import vote_repository_singleton
 from src.models import db
 
-#TODO make sure there are no references to these anymore
-# i want to delete them now but im scared it will break something that I wont notice 
-from post import Post
-from comment import Comment
-
 from dotenv import load_dotenv
 import os
 
@@ -20,9 +15,15 @@ load_dotenv()
 
 app = Flask(__name__)
 
+
 # DB connection
-app.config['SQLALCHEMY_DATABASE_URI'] = \
+if os.getenv("ENV") == 'testing':
+   app.config['SQLALCHEMY_DATABASE_URI'] = \
+    f'postgresql://{os.getenv("DB_TEST_USER")}:{os.getenv("DB_TEST_PASS")}@{os.getenv("DB_TEST_HOST")}:{os.getenv("DB_TEST_PORT")}/{os.getenv("DB_TEST_NAME")}'
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = \
     f'postgresql://{os.getenv("DB_USER")}:{os.getenv("DB_PASS")}@{os.getenv("DB_HOST")}:{os.getenv("DB_PORT")}/{os.getenv("DB_NAME")}'
+    
 app.config['SQLALCHEMY_ECHO'] = True
 db.init_app(app)
 
@@ -30,7 +31,6 @@ db.init_app(app)
 app.secret_key = os.getenv('APP_SECRET_KEY', 'super-secure')
 bcrypt = Bcrypt(app)
 
-#FIX: needs to display all posts 
 # Home page
 @app.route('/')
 def index():
@@ -251,11 +251,14 @@ def get_user_downvoted(user_id: int):
 #Reference: module-15-assignment
 @app.get('/users/search')
 def search_users():
+    user = None
+    if 'user_id' in session:
+        user = user_repository_singleton.get_user_by_id(session.get('user_id'))    
     found_user = None
     q = request.args.get('q', '')
     if q != '':
         found_user = user_repository_singleton.search_users(q)
-    return render_template('search_users.html', user=found_user)
+    return render_template('search_users.html', user=user, found_user=found_user)
 
 # Create posts
 @app.get('/posts/new')
