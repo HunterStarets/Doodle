@@ -50,10 +50,10 @@ class PostRepository:
     
     def get_all_posts_newest_first(self):
         return Post2.query.order_by(Post2.timestamp.desc()).all()
+
+    def get_single_post(self, author_id):
+        post = Post2.query.filter_by(author_id=author_id).first()
+        return post
     
-    def get_single_post(self, user_id):
-        post = Post2.query.filter_by(author_id=user_id).first()
-
-
 # Singleton to be used in other modules
 post_repository_singleton = PostRepository()

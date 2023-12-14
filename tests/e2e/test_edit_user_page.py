@@ -32,7 +32,7 @@ def test_edit_user_unauthorized(test_app: FlaskClient):
 
     assert response.status_code == 403
 
-def test_edit_user_failure(test_app: FlaskClient):
+def test_edit_user_empty(test_app: FlaskClient):
     with app.app_context():
         clear_db()
         response = test_app.post('/signup', data={
