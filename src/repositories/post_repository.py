@@ -45,23 +45,15 @@ class PostRepository:
     def get_all_posts_by_post_votes(self, post_votes):
         return None
 
-
     def get_all_posts(self):
         return Post2.query.all()
     
     def get_all_posts_newest_first(self):
         return Post2.query.order_by(Post2.timestamp.desc()).all()
     
-    
-    # def create_post(self, author_id, title, content, community_name):
-    #     #db.session.query(db.func.count(Vote.vote_id)).filter(Vote.post_id == self.post_id, Vote.is_upvote == True).scalar() - \ db.session.query(db.func.count(Vote.vote_id)).filter(Vote.post_id == self.post_id, Vote.is_upvote == False).scalar()
-    #     new_post = Post2(author_id=author_id, title=title, content=content, community_name=community_name)
-    #     db.session.add(new_post)
-    #     db.session.commit()
-    #     return new_post
-    
-    # def get_post_by_id(self, post_id):
-    #     return Post2.query.get(post_id)
+    def get_post_id(self, post):
+        post_id = Post2.query.filter_by(post_id=post.post_id).first()
+        return post_id
     
 # Singleton to be used in other modules
 post_repository_singleton = PostRepository()

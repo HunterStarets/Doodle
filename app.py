@@ -168,7 +168,7 @@ def delete_user(user_id: int):
     if not(username and password and checkbox):
         abort(400)
     
-    existing_user = user_repository_singleton.get_user_by_id(user_id)
+    existing_user = user_repository_singleton.get_user_by_username(username)
     if not existing_user: 
         abort(401)
 
