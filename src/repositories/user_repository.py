@@ -84,5 +84,9 @@ class UserRepository:
         found_user = User.query.filter(func.lower(User.username).like(func.lower(f'%{username}%'))).first()
         return found_user
     
+    def get_users_id(self, user):
+        user_id = user.user_id
+        return user_id
+
 # Singleton to be used in other modules
 user_repository_singleton = UserRepository()

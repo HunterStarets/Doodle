@@ -10,7 +10,7 @@ def test_home_page(test_app: FlaskClient):
         response = test_app.get('/')
         response_data = response.data.decode('utf-8')
 
-    assert '<div class="col-md-9">' in response_data
+    assert '<h5 class="card-title">Login</h5>' in response_data
     assert response.status_code == 200
     
 def test_post_lists(test_app: FlaskClient):
