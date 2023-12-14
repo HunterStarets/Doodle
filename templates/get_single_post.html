@@ -19,7 +19,7 @@ session.get('user_id')) %}
             author.username }}</a></p>
     <div id="edit-post-container">
         <textarea id="post-textarea" class="form-control" style="min-height: 125px; background-color: white;"
-            disabled> {{ existing_post.content }}</textarea>
+            disabled>{{ existing_post.content }}</textarea>
     </div>
     <div class="d-flex flex-row pt-1">
         {% if session.get('user_id') %}
